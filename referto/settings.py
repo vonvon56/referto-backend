@@ -45,20 +45,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'users',
+    'account',
     'assignments',
     'papers',
     'paperinfos',
     'memos',
     'django.contrib.sites',
     'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
+    # 'allauth.account',
+    # 'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'rest_framework',
+    'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'dj_rest_auth',
     'corsheaders',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -147,9 +149,12 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
 }
 
 
@@ -157,6 +162,22 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
+
+from datetime import timedelta
+
+REST_USE_JWT = True
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30), ### 1 -> access token의 수명을 30분으로 설정
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1), ### 1 -> refresh token의 수명을 하루로 설정
+    'ROTATE_REFRESH_TOKENS': True,
+    'BLACKLIST_AFTER_ROTATION': True,
+    'AUTH_HEADER_TYPES': ('Bearer', ), ### 2 -> 토큰 인증 방식을 bearer로 설정
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken', ),
+    'ACCESS_TOKEN': 'access_token',
+    'REFRESH_TOKEN': 'refresh_token',
+}
+
 
 # Google Social Provider 설정
 SOCIALACCOUNT_PROVIDERS = {

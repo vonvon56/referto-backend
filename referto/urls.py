@@ -16,9 +16,34 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from account.views import SignInView, SignUpView
+from rest_framework import permissions
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+
+# swagger settings
+schema_view = get_schema_view(
+    openapi.Info(
+        title="LIKELION Blog API",
+        default_version='v1',
+        description="Test description",
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+
+    path('api/users/', SignUpView.as_view(), name='create-user'),
+    # path('api/users/<str:user_id>/', UserDeleteView.as_view(), name='delete-user'),
+
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
     path('api/auth/social/', include('allauth.socialaccount.urls')),
