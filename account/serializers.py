@@ -7,13 +7,13 @@ from .models import UserProfile
 class EmailUsernameSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "email"]
+        fields = ["id", "email", "username"]
 
 
 class UserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ["id", "password", "email"]
+        fields = ["id", "password", "email", "username"]
 
 
 class UserProfileSerializer(ModelSerializer):

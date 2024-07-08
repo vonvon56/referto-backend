@@ -211,3 +211,18 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # 프론트엔드 도메인
     # "http://<your-frontend-domain>",  # 실제 배포 환경의 프론트엔드 도메인
 ]
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False, # swagger가 기본으로 사용하는 session auth를 사용하지 않음
+    'SECURITY_DEFINITIONS': {
+        'BearerAuth': { # bearer 토큰을 헤더의 Authorization에 담아서 보냄
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header',
+            'description': "JWT Token"
+        }
+    },
+    'SECURITY_REQUIREMENTS': [{
+        'BearerAuth': []
+    }]
+}
