@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import User
+from django.contrib.auth.models import User
 
 class Assignment(models.Model):
     assignment_id = models.AutoField(primary_key=True)  # 자동 증가 ID 필드
