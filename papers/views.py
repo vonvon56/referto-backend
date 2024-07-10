@@ -18,24 +18,25 @@ class PaperUploadView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser)
 
-    @swagger_auto_schema(
-        operation_description="새로운 Paper를 생성합니다.",
-        request_body=openapi.Schema(
-            type=openapi.TYPE_OBJECT,
-            properties={
-                'pdf': openapi.Schema(type=openapi.TYPE_FILE, description='PDF 파일'),
-                'assignment': openapi.Schema(type=openapi.TYPE_INTEGER, description='Assignment ID')
-            },
-            required=['pdf', 'assignment']
-        ),
-        responses={
-            201: openapi.Response('Successfully created', PaperCreateSerializer),
-            400: 'Bad request'
-        },
-        manual_parameters=[
-            openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
-        ]
-    )
+    # @swagger_auto_schema(
+    #     operation_description="새로운 Paper를 생성합니다.",
+    #     request_body=openapi.Schema(
+    #         type=openapi.TYPE_OBJECT,
+    #         properties={
+    #             'pdf': openapi.Schema(type=openapi.TYPE_FILE, description='PDF 파일'),
+    #             'assignment': openapi.Schema(type=openapi.TYPE_INTEGER, description='Assignment ID')
+    #         },
+    #         required=['pdf', 'assignment']
+    #     ),
+    #     responses={
+    #         201: openapi.Response('Successfully created', PaperCreateSerializer),
+    #         400: 'Bad request'
+    #     },
+    #     manual_parameters=[
+    #         openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
+    #     ]
+    # )
+
     def post(self, request, *args, **kwargs):
         serializer = PaperCreateSerializer(data=request.data)
         if serializer.is_valid():
@@ -45,8 +46,6 @@ class PaperUploadView(generics.GenericAPIView):
             paper.save()
             return Response({"message": "Paper created successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 
