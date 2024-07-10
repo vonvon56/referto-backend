@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from account.views import SigninView, SignupView
 from papers.views import PaperUploadView
-# from memos.views import MemoDetailView
+from memos.views import MemoDetailView
 from assignments.views import AssignmentListView, AssignmentDetailView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
@@ -48,11 +48,11 @@ urlpatterns = [
     path('api/account/signin', SigninView.as_view(), name='signin'),
 
     path('api/assignments/', AssignmentListView.as_view(), name='assignment-list'),
-    path('api/assignments/<int:pk>/', AssignmentDetailView.as_view(), name='assignment-list'),
+    path('api/assignments/<int:pk>/', AssignmentDetailView.as_view(), name='assignment-detail'),
 
-    path('api/papers/upload', PaperUploadView.as_view(), name='paper-upload'),
+    path('api/papers/', PaperUploadView.as_view(), name='paper-upload'),
 
-    # path('api/papers/memo', MemoDetailView.as_view(), name='memo'),
+    path('api/papers/<int:pk>/memo', MemoDetailView.as_view(), name='memo'),
 
 
     path('api/auth/', include('dj_rest_auth.urls')),
