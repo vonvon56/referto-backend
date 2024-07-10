@@ -15,18 +15,26 @@ class MemoDetailView(generics.GenericAPIView):
     @swagger_auto_schema(
         operation_description="해당 메모를 가져옵니다.",
         responses={200: MemoSerializer()},
-        manual_parameters=[openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)]
+        manual_parameters=[
+            openapi.Parameter(
+                "Authorization", 
+                openapi.IN_HEADER, 
+                description="access token", 
+                type=openapi.TYPE_STRING
+            )
+        ]
     )
     def get(self, request, *args, **kwargs):
+        if getattr(self, 'swagger_fake_view', False):
+            return Response()
+        
         paper_id = kwargs.get('pk')
 
-        # 요청한 paper_id로 Paper 객체를 가져옴
         try:
             paper = Paper.objects.get(paper_id=paper_id)
         except Paper.DoesNotExist:
             return Response({"detail": "Paper not found."}, status=404)
         
-        # paper 객체를 사용해 Memo 객체를 가져옴
         memo = Memo.objects.filter(paper=paper).first()
 
         if memo is None:
@@ -38,24 +46,30 @@ class MemoDetailView(generics.GenericAPIView):
         serializer = self.serializer_class(memo)
         return Response(serializer.data)
 
-    serializer_class = MemoSerializer
-    permission_classes = [IsAuthenticated]
-
     @swagger_auto_schema(
         operation_description="해당 메모를 수정하거나 없으면 생성합니다.",
         responses={200: MemoSerializer()},
-        manual_parameters=[openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)]
+        manual_parameters=[
+            openapi.Parameter(
+                "Authorization", 
+                openapi.IN_HEADER, 
+                description="access token", 
+                type=openapi.TYPE_STRING
+            )
+        ],
+        request_body=MemoSerializer
     )
     def put(self, request, *args, **kwargs):
+        if getattr(self, 'swagger_fake_view', False):
+            return Response()
+        
         paper_id = kwargs.get('pk')
 
-        # 요청한 paper_id로 Paper 객체를 가져옴
         try:
             paper = Paper.objects.get(paper_id=paper_id)
         except Paper.DoesNotExist:
             return Response({"detail": "Paper not found."}, status=404)
         
-        # paper 객체로 Memo 객체를 가져옴
         memo = Memo.objects.filter(paper=paper).first()
         data = request.data.copy()
 
@@ -67,7 +81,6 @@ class MemoDetailView(generics.GenericAPIView):
             serializer = MemoSerializer(data=data)
 
         if serializer.is_valid():
-            # 새로운 Memo 생성 시 paper 설정
             serializer.save(paper=paper)
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
