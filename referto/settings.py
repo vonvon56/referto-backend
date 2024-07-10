@@ -17,12 +17,15 @@ import os, environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(
-    DEBUG=(bool, True)
+    DEBUG=(bool, False)
 )
 
 environ.Env.read_env(
     env_file=os.path.join(BASE_DIR, '.env')
 )
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -39,6 +42,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -52,21 +56,20 @@ INSTALLED_APPS = [
     'memos',
     'django.contrib.sites',
     'allauth',
-    # 'allauth.account',
-    # 'allauth.socialaccount',
+    #'allauth.account',
+    'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework.authtoken',
     'dj_rest_auth',
-    'corsheaders',
     'drf_yasg',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -149,80 +152,7 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
+    'DEFAULT_PERMISSION_CLASSES' : (
         'rest_framework.permissions.AllowAny',
-    ],
-}
-
-
-AUTHENTICATION_BACKENDS = (
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
-)
-
-from datetime import timedelta
-
-REST_USE_JWT = True
-
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30), ### 1 -> access token의 수명을 30분으로 설정
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1), ### 1 -> refresh token의 수명을 하루로 설정
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'AUTH_HEADER_TYPES': ('Bearer', ), ### 2 -> 토큰 인증 방식을 bearer로 설정
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken', ),
-    'ACCESS_TOKEN': 'access_token',
-    'REFRESH_TOKEN': 'refresh_token',
-}
-
-
-# Google Social Provider 설정
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-        'OAUTH_PKCE_ENABLED': True,
-    }
-}
-
-# Google OAuth 2.0 클라이언트 ID 및 비밀 키 설정
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv('GOOGLE_OAUTH2_KEY')
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv('GOOGLE_OAUTH2_SECRET')
-
-SITE_ID = 1
-
-LOGIN_REDIRECT_URL = '/'  # 로그인 후 리다이렉트할 URL
-LOGOUT_REDIRECT_URL = '/'  # 로그아웃 후 리다이렉트할 URL
-
-# 이메일 인증을 사용하지 않으려면 False로 설정
-ACCOUNT_EMAIL_VERIFICATION = 'none'
-ACCOUNT_AUTHENTICATION_METHOD = 'username'
-ACCOUNT_EMAIL_REQUIRED = True
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # 프론트엔드 도메인
-    # "http://<your-frontend-domain>",  # 실제 배포 환경의 프론트엔드 도메인
-]
-
-SWAGGER_SETTINGS = {
-    'USE_SESSION_AUTH': False, # swagger가 기본으로 사용하는 session auth를 사용하지 않음
-    'SECURITY_DEFINITIONS': {
-        'BearerAuth': { # bearer 토큰을 헤더의 Authorization에 담아서 보냄
-            'type': 'apiKey',
-            'name': 'Authorization',
-            'in': 'header',
-            'description': "JWT Token"
-        }
-    },
-    'SECURITY_REQUIREMENTS': [{
-        'BearerAuth': []
-    }]
+    )
 }

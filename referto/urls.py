@@ -17,8 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from account.views import SigninView, SignupView
-from papers.views import PaperListView, PaperDetailView
-from memos.views import MemoDetailView
+from papers.views import PaperUploadView
 from memos.views import MemoDetailView
 from assignments.views import AssignmentListView, AssignmentDetailView
 from rest_framework import permissions
@@ -51,10 +50,9 @@ urlpatterns = [
     path('api/assignments/', AssignmentListView.as_view(), name='assignment-list'),
     path('api/assignments/<int:pk>/', AssignmentDetailView.as_view(), name='assignment-detail'),
 
-    path('api/papers', PaperListView.as_view(), name='paper-list'),
-    path('api/papers/<int:pk>/', PaperDetailView.as_view(), name='paper-detail'),
+    path('api/papers/', PaperUploadView.as_view(), name='paper-upload'),
 
-    path('api/papers/<int:pk>/memo/', MemoDetailView.as_view(), name='memo-update'),
+    path('api/papers/<int:pk>/memo', MemoDetailView.as_view(), name='memo'),
 
 
     path('api/auth/', include('dj_rest_auth.urls')),
