@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from account.views import SigninView, SignupView
+from account.views import SigninView, SignupView, UserInfoView
 from papers.views import PaperUploadView
 from memos.views import MemoDetailView
 from assignments.views import AssignmentListView, AssignmentDetailView
@@ -46,6 +46,8 @@ urlpatterns = [
 
     path('api/account/signup', SignupView.as_view(), name='signup'),
     path('api/account/signin', SigninView.as_view(), name='signin'),
+    path('api/account/info', UserInfoView.as_view(), name='user-info'),
+
 
     path('api/assignments/', AssignmentListView.as_view(), name='assignment-list'),
     path('api/assignments/<int:pk>/', AssignmentDetailView.as_view(), name='assignment-detail'),
