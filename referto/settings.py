@@ -160,3 +160,9 @@ REST_FRAMEWORK = {
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+]
+
+ORS_ALLOW_CREDENTIALS = True

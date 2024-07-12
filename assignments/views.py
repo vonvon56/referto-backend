@@ -83,9 +83,8 @@ class AssignmentListView(generics.GenericAPIView):
             openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
         ]
     )
-    def put(self, request, *args, **kwargs):
+    def put(self, request, assignment_id):
         user = self.request.user
-        assignment_id = request.data.get('assignment_id')
         if not assignment_id:
             return Response({"message": "Assignment ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
