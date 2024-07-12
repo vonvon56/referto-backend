@@ -44,9 +44,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 
-    path('api/account/signup', SignupView.as_view(), name='signup'),
-    path('api/account/signin', SigninView.as_view(), name='signin'),
-    path('api/account/info', UserInfoView.as_view(), name='user-info'),
+    path('api/account/signup/', SignupView.as_view(), name='signup'),
+    path('api/account/signin/', SigninView.as_view(), name='signin'),
+    path('api/account/info/', UserInfoView.as_view(), name='user-info'),
 
 
     path('api/assignments/', AssignmentListView.as_view(), name='assignment-list'),
@@ -54,7 +54,7 @@ urlpatterns = [
 
     path('api/papers/', PaperUploadView.as_view(), name='paper-upload'),
 
-    path('api/papers/<int:pk>/memo', MemoDetailView.as_view(), name='memo'),
+    path('api/papers/<int:pk>/memo/', MemoDetailView.as_view(), name='memo'),
 
 
     path('api/auth/', include('dj_rest_auth.urls')),
