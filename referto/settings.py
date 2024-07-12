@@ -191,3 +191,8 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN': 'access_token',
     'REFRESH_TOKEN': 'refresh_token',
 }
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+]
+
+ORS_ALLOW_CREDENTIALS = True
