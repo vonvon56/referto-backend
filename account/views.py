@@ -97,7 +97,7 @@ class UserInfoView(APIView):
         operation_description="현재 로그인한 사용자의 정보를 조회합니다.",
         responses={200: EmailUsernameSerializer, 401: "Unauthorized"},
     )
-    def post(self, request):
+    def get(self, request):
         if not request.user.is_authenticated:
             return Response({"detail": "로그인 후 다시 시도해주세요"}, status=status.HTTP_401_UNAUTHORIZED)
         user = request.user
