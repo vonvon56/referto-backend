@@ -18,7 +18,7 @@ openai.api_key = settings.OPENAI_API_KEY
 
 # PDF 파일의 특정 페이지 텍스트 추출 함수
 def extract_text_from_pdf(pdf_path, start_page, end_page):
-    document = fitz.open(pdf_path)
+    document = fitz.open(pdf_path) #pdf 첫 페이지만 추출 + img 를 text 로 바꾸는 도구
     text = ""
     for page_num in range(start_page - 1, end_page):
         page = document.load_page(page_num)
