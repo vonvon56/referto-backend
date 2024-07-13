@@ -23,7 +23,7 @@ from assignments.views import AssignmentListView, AssignmentDetailView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-
+from paperinfos.views import ProcessPaperInfo
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -35,6 +35,9 @@ schema_view = get_schema_view(
         title="LIKELION Blog API",
         default_version='v1',
         description="Test description",
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="contact@yourdomain.local"),
+        license=openapi.License(name="BSD License"),
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
@@ -43,6 +46,10 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+
+    path('api/account/signup', SignupView.as_view(), name='signup'),
+    path('api/account/signin', SigninView.as_view(), name='signin'),
+    path('api/account/info', UserInfoView.as_view(), name='user-info'),
 
     path('api/account/signup/', SignupView.as_view(), name='signup'),
     path('api/account/signin/', SigninView.as_view(), name='signin'),
@@ -56,6 +63,7 @@ urlpatterns = [
 
     path('api/papers/<int:pk>/memo/', MemoDetailView.as_view(), name='memo'),
 
+    path('api/paperinfo/<int:paper_id>/', ProcessPaperInfo.as_view(), name='process_paper_info'), 
 
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
