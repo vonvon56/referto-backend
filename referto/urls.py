@@ -54,13 +54,13 @@ urlpatterns = [
 
     path('api/papers/', PaperUploadView.as_view(), name='paper-upload'),
 
-    path('api/papers/<int:pk>/memo', MemoDetailView.as_view(), name='memo'),
+    # path('api/papers/<int:pk>/memo/', MemoDetailView.as_view(), name='memo'),
 
 
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
     path('api/auth/social/', include('allauth.socialaccount.urls')),
-    path('api/assignments/', include('assignments.urls'))
+
 ]
 
 
