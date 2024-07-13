@@ -11,6 +11,7 @@ from drf_yasg import openapi
 
 class AssignmentListView(generics.GenericAPIView):
     serializer_class = AssignmentSerializer
+    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_description="해당 유저의 모든 Assignments를 가져옵니다.",
@@ -33,6 +34,7 @@ class AssignmentListView(generics.GenericAPIView):
         manual_parameters=[openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)]
     )
     def post(self, request, *args, **kwargs):
+        print("00")
         if not request.user.is_authenticated:
             raise PermissionDenied("You must be logged in to create an assignment.")
         serializer = AssignmentSerializer(data=request.data)
