@@ -50,14 +50,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'account',
     'assignments',
     'papers',
     'paperinfos',
     'memos',
-    'django.contrib.sites',
     'allauth',
-    #'allauth.account',
+    # 'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
     'rest_framework',
@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'dj_rest_auth',
     'drf_yasg',
+    'referto.apps.RefertoConfig',
 ]
 
 MIDDLEWARE = [

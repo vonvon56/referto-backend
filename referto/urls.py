@@ -51,7 +51,6 @@ urlpatterns = [
     path('api/account/signin/', SigninView.as_view(), name='signin'),
     path('api/account/info/', UserInfoView.as_view(), name='user-info'),
 
-
     path('api/assignments/', AssignmentListView.as_view(), name='assignment-list'),
     path('api/assignments/<int:pk>/', AssignmentDetailView.as_view(), name='assignment-detail'),
 
