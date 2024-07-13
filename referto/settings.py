@@ -58,14 +58,15 @@ INSTALLED_APPS = [
     'memos',
     'allauth',
     # 'allauth.account',
-    # 'allauth.socialaccount',
-    # 'allauth.socialaccount.providers.google',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'rest_framework',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'rest_framework.authtoken',
     'dj_rest_auth',
     'drf_yasg',
+    'referto.apps.RefertoConfig',
 ]
 
 MIDDLEWARE = [
