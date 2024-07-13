@@ -33,8 +33,10 @@ class AssignmentListView(generics.GenericAPIView):
         manual_parameters=[openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)]
     )
     def post(self, request, *args, **kwargs):
+        print(request.user)
         if not request.user.is_authenticated:
             raise PermissionDenied("You must be logged in to create an assignment.")
+        print(request.data)
         serializer = AssignmentSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(user=request.user)
