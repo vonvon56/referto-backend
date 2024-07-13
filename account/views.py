@@ -26,13 +26,13 @@ def generate_token_in_serialized_data(user, user_profile):
     serialized_data["token"] = {"access": access_token, "refresh": refresh_token}
     return serialized_data
 
-def set_token_on_response_cookie(user, status_code):
+def set_token_on_response_cookie(user, status_code) -> Response:
     token = RefreshToken.for_user(user)
     user_profile = UserProfile.objects.get(user=user)
     serialized_data = UserProfileSerializer(user_profile).data
     res = Response(serialized_data, status=status_code)
-    res.set_cookie("refresh_token", value=str(token), httponly=False)
-    res.set_cookie("access_token", value=str(token.access_token), httponly=False)
+    res.set_cookie("refresh_token", value=str(token))
+    res.set_cookie("access_token", value=str(token.access_token))
     return res
 
 #### view
@@ -57,10 +57,10 @@ class SignupView(APIView):
             user.save()
                 
         user_profile = UserProfile.objects.create(
-                user=user,
-                email=email
-            )
-        
+            user=user,
+            email=email
+        )
+
         return set_token_on_response_cookie(user, status_code=status.HTTP_201_CREATED)
         #     serialized_data = generate_token_in_serialized_data(user, user_profile )
         #     # 생성된 token, UserProfile 정보를 Response에 담아서 반환
