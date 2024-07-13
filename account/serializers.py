@@ -8,6 +8,7 @@ class EmailUsernameSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = ["id", "email", "username"]
+        #username 은 필수여서 username == email
 
 
 class UserSerializer(ModelSerializer):

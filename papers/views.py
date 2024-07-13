@@ -6,6 +6,7 @@ from rest_framework.exceptions import PermissionDenied
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import Paper
+from memos.models import Memo
 from .serializers import PaperSerializer
 from .request_serializers import PaperCreateSerializer
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -17,7 +18,6 @@ class PaperUploadView(generics.GenericAPIView):
     serializer_class = PaperCreateSerializer
     permission_classes = [IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser)
-
     @swagger_auto_schema(
         operation_description="새로운 Paper를 생성합니다.",
         # request_body=openapi.Schema(
@@ -43,10 +43,9 @@ class PaperUploadView(generics.GenericAPIView):
             assignment_id = request.data['assignment']
             paper = Paper(pdf=pdf_file, assignment_id=assignment_id)
             paper.save()
+            Memo.objects.create(paper=paper)
             return Response({"message": "Paper created successfully", "data": serializer.data}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 
 
