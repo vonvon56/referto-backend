@@ -17,6 +17,7 @@ from account.request_serializers import (
     SignUpRequestSerializer,
 )
 
+
 def generate_token_in_serialized_data(user, user_profile):
     token = RefreshToken.for_user(user)
     refresh_token, access_token = str(token), str(token.access_token)
@@ -29,8 +30,8 @@ def set_token_on_response_cookie(user, status_code):
     user_profile = UserProfile.objects.get(user=user)
     serialized_data = UserProfileSerializer(user_profile).data
     res = Response(serialized_data, status=status_code)
-    res.set_cookie("refresh_token", value=str(token), httponly=True)
-    res.set_cookie("access_token", value=str(token.access_token), httponly=True)
+    res.set_cookie("refresh_token", value=str(token), httponly=False)
+    res.set_cookie("access_token", value=str(token.access_token), httponly=False)
     return res
 
 #### view
@@ -54,12 +55,12 @@ class SignupView(APIView):
             user.set_password(user.password)
             user.save()
                 
-            user_profile = UserProfile.objects.create(
+        user_profile = UserProfile.objects.create(
                 user=user,
                 email=email
             )
-
-            return set_token_on_response_cookie(user, status_code=status.HTTP_201_CREATED)
+        
+        return set_token_on_response_cookie(user, status_code=status.HTTP_201_CREATED)
         #     serialized_data = generate_token_in_serialized_data(user, user_profile )
         #     # 생성된 token, UserProfile 정보를 Response에 담아서 반환
         #     return Response(serialized_data, status=status.HTTP_201_CREATED)
@@ -89,15 +90,38 @@ class SigninView(APIView):
             return Response(
                 {"message": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
             )
-        
+
+class SignOutView(APIView):
+    @swagger_auto_schema(
+        operation_id="로그아웃",
+        operation_description="로그아웃을 진행합니다.",
+        responses={204: "No Content"},
+    )
+    def post(self, request):
+
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "please signin"}, status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        refresh_token = request.data.get("refresh")
+        if not refresh_token:
+            return Response(
+                {"detail": "no refresh token"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        RefreshToken(refresh_token).blacklist()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
 class UserInfoView(APIView):
+
     @swagger_auto_schema(
         operation_id="사용자 정보 조회",
         operation_description="현재 로그인한 사용자의 정보를 조회합니다.",
         responses={200: EmailUsernameSerializer, 401: "Unauthorized"},
     )
-    def post(self, request):
+    def get(self, request):
         if not request.user.is_authenticated:
             return Response({"detail": "로그인 후 다시 시도해주세요"}, status=status.HTTP_401_UNAUTHORIZED)
         user = request.user
