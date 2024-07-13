@@ -36,8 +36,9 @@ class PaperUploadView(generics.GenericAPIView):
             openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
         ]
     )
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
         serializer = PaperCreateSerializer(data=request.data)
+        # print(request)
         if serializer.is_valid():
             pdf_file = request.FILES['pdf']
             assignment_id = request.data['assignment']

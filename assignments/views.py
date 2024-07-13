@@ -34,7 +34,6 @@ class AssignmentListView(generics.GenericAPIView):
         manual_parameters=[openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)]
     )
     def post(self, request, *args, **kwargs):
-        print("00")
         if not request.user.is_authenticated:
             raise PermissionDenied("You must be logged in to create an assignment.")
         serializer = AssignmentSerializer(data=request.data)
@@ -69,7 +68,12 @@ class AssignmentListView(generics.GenericAPIView):
         
     #     assignment.delete()
     #     return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
+
+class AssignmentDetailView(generics.GenericAPIView):
+    serializer_class = AssignmentSerializer
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_description="특정 Assignment를 수정합니다.",
         responses={200: AssignmentSerializer},
@@ -85,12 +89,12 @@ class AssignmentListView(generics.GenericAPIView):
             openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
         ]
     )
-    def put(self, request, assignment_id):
+    def put(self, request, pk):
         user = self.request.user
-        if not assignment_id:
+        if not pk:
             return Response({"message": "Assignment ID is required"}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            assignment = Assignment.objects.get(assignment_id=assignment_id, user=user)
+            assignment = Assignment.objects.get(assignment_id=pk, user=user)
         except Assignment.DoesNotExist:
             return Response({"message": "Assignment not found or not yours"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -99,11 +103,6 @@ class AssignmentListView(generics.GenericAPIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class AssignmentDetailView(generics.GenericAPIView):
-    serializer_class = AssignmentSerializer
-    permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_description="특정 Assignment를 삭제합니다.",
