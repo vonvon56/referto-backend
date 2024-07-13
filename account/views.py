@@ -17,6 +17,7 @@ from account.request_serializers import (
     SignUpRequestSerializer,
 )
 
+
 def generate_token_in_serialized_data(user, user_profile):
     token = RefreshToken.for_user(user)
     refresh_token, access_token = str(token), str(token.access_token)
@@ -89,9 +90,32 @@ class SigninView(APIView):
             return Response(
                 {"message": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
             )
-        
+
+class SignOutView(APIView):
+    @swagger_auto_schema(
+        operation_id="로그아웃",
+        operation_description="로그아웃을 진행합니다.",
+        responses={204: "No Content"},
+    )
+    def post(self, request):
+
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "please signin"}, status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        refresh_token = request.data.get("refresh")
+        if not refresh_token:
+            return Response(
+                {"detail": "no refresh token"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        RefreshToken(refresh_token).blacklist()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
 class UserInfoView(APIView):
+
     @swagger_auto_schema(
         operation_id="사용자 정보 조회",
         operation_description="현재 로그인한 사용자의 정보를 조회합니다.",
