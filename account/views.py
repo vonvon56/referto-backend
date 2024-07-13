@@ -1,7 +1,8 @@
 # 만들어둔 모델, serializer (User, UserProfile) import
 from django.contrib.auth.models import User
 from .models import UserProfile
-from .serializers import UserSerializer,UserProfileSerializer,EmailUsernameSerializer
+from .serializers import UserSerializer,UserProfileSerializer, EmailUsernameSerializer
+
 
 # APIView, JWT token, 비밀번호 해싱을 위해 필요한 class import
 from rest_framework import status
@@ -11,7 +12,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
-
+from rest_framework.permissions import IsAuthenticated
 from account.request_serializers import (
     SignInRequestSerializer,
     SignUpRequestSerializer,
@@ -91,6 +92,7 @@ class SigninView(APIView):
                 {"message": "User does not exist"}, status=status.HTTP_404_NOT_FOUND
             )
 
+
 class SignOutView(APIView):
     @swagger_auto_schema(
         operation_id="로그아웃",
@@ -121,9 +123,13 @@ class UserInfoView(APIView):
         operation_description="현재 로그인한 사용자의 정보를 조회합니다.",
         responses={200: EmailUsernameSerializer, 401: "Unauthorized"},
     )
+
     def get(self, request):
+
         if not request.user.is_authenticated:
             return Response({"detail": "로그인 후 다시 시도해주세요"}, status=status.HTTP_401_UNAUTHORIZED)
         user = request.user
         serializer = EmailUsernameSerializer(user)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
+
