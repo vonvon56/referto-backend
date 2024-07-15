@@ -23,7 +23,7 @@ from assignments.views import AssignmentListView, AssignmentDetailView
 from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
-from paperinfos.views import ProcessPaperInfo
+from paperinfos.views import ProcessPaperInfo, PaperInfoListView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -51,7 +51,6 @@ urlpatterns = [
     path('api/account/signin/', SigninView.as_view(), name='signin'),
     path('api/account/info/', UserInfoView.as_view(), name='user-info'),
 
-
     path('api/assignments/', AssignmentListView.as_view(), name='assignment-list'),
     path('api/assignments/<int:pk>/', AssignmentDetailView.as_view(), name='assignment-detail'),
 
@@ -60,6 +59,7 @@ urlpatterns = [
     path('api/papers/<int:pk>/memo/', MemoDetailView.as_view(), name='memo'),
 
     path('api/paperinfo/<int:paper_id>/', ProcessPaperInfo.as_view(), name='process_paper_info'), 
+    path('api/paperinfo/assignment/<int:assignment_id>/', PaperInfoListView.as_view(), name='paperinfo_list'),
 
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),

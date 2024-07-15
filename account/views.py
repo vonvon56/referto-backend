@@ -125,7 +125,6 @@ class UserInfoView(APIView):
     )
 
     def get(self, request):
-
         if not request.user.is_authenticated:
             return Response({"detail": "로그인 후 다시 시도해주세요"}, status=status.HTTP_401_UNAUTHORIZED)
         user = request.user

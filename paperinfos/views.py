@@ -10,15 +10,17 @@ from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import Paper, PaperInfo
+from assignments.models import Assignment
 import time
 from openai.error import OpenAIError, RateLimitError, InvalidRequestError  # 여기서 예외 클래스 가져오기
 from rest_framework.permissions import IsAuthenticated
+from paperinfos.serializers import PaperInfoSerializer
 # OpenAI API 키 설정
 openai.api_key = settings.OPENAI_API_KEY
 
 # PDF 파일의 특정 페이지 텍스트 추출 함수
 def extract_text_from_pdf(pdf_path, start_page, end_page):
-    document = fitz.open(pdf_path)
+    document = fitz.open(pdf_path) #pdf 첫 페이지만 추출 + img 를 text 로 바꾸는 도구
     text = ""
     for page_num in range(start_page - 1, end_page):
         page = document.load_page(page_num)
@@ -86,6 +88,7 @@ class ProcessPaperInfo(APIView):
             )
         ]
     )
+    
     def post(self, request, paper_id):
         paper = get_object_or_404(Paper, paper_id=paper_id)
         if not paper.pdf:
@@ -125,3 +128,29 @@ class ProcessPaperInfo(APIView):
             return Response({"error": "Error parsing the response from OpenAI."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class PaperInfoListView(APIView):
+        @swagger_auto_schema(
+            operation_id="PaperInfo 목록 조회",
+            operation_description="참고문헌 목록을 조회합니다.",
+            responses={
+                200: PaperInfoSerializer(many=True),
+                404: "Not Found",
+            }
+        )
+        def get(self, request, assignment_id):
+            assignment = get_object_or_404(Assignment, assignment_id=assignment_id)
+            
+            if not Paper.objects.filter(assignment=assignment).exists():
+                return Response([], status=status.HTTP_200_OK) #return empty list if no paperinfos are found
+        
+            try:
+                papers = Paper.objects.filter(assignment=assignment)
+                paperinfos = PaperInfo.objects.filter(paper__in=papers)
+
+                serializer = PaperInfoSerializer(paperinfos, many=True)
+            
+            except:
+                return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
