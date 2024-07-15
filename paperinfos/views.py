@@ -139,7 +139,6 @@ class PaperInfoListView(APIView):
             }
         )
         def get(self, request, assignment_id):
-            print("-----------arrived to views.py----------")
             assignment = get_object_or_404(Assignment, assignment_id=assignment_id)
             
             if not Paper.objects.filter(assignment=assignment).exists():
@@ -154,4 +153,5 @@ class PaperInfoListView(APIView):
             except:
                 return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
             
+            #여기서 에러
             return Response(serializer.data, status=status.HTTP_200_OK)
