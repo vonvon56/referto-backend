@@ -39,6 +39,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
+NAVER_CLIENT_ID = os.getenv('NAVER_CLIENT_ID')
+NAVER_CLIENT_SECRET = os.getenv('NAVER_CLIENT_SECRET')
+NAVER_REDIRECT_URI = 'http://localhost:8000/accounts/naver/callback/'
+LOGIN_REDIRECT_URL = 'http://localhost:3000/'  # 로그인 후 리디렉트될 URL
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
 # Application definition
 
