@@ -112,13 +112,14 @@ class ProcessPaperInfo(APIView):
                     'vancouver_reference': paper_info_list[7]
                 }
             )
+            serializer = PaperInfoSerializer(paper_info_instance)
             
             if created:
                 message = "PaperInfo created successfully."
             else:
                 message = "PaperInfo updated successfully."
             
-            return Response({"message": message, "paper_info_id": paper_info_instance.paperInfo_id}, status=status.HTTP_200_OK)
+            return Response({"message": message, "paper_info": serializer.data}, status=status.HTTP_200_OK)
         
         except RateLimitError:
             return Response({"error": "Rate limit exceeded. Please try again later."}, status=status.HTTP_429_TOO_MANY_REQUESTS)
@@ -128,6 +129,45 @@ class ProcessPaperInfo(APIView):
             return Response({"error": "Error parsing the response from OpenAI."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    def delete(self, request, paper_id):
+        try:
+            paperInfo_id = paper_id
+            paperinfo = PaperInfo.objects.get(paperInfo_id=paperInfo_id)
+        except:
+            return Response(
+                {"detail": "PaperInfo Not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+        paperinfo.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    def put(self, request, paper_id):
+        try:
+            paperInfo_id = paper_id
+            paperinfo = PaperInfo.objects.get(paperInfo_id=paperInfo_id)
+        except:
+            return Response(
+                {"detail": "PaperInfo Not found."}, status=status.HTTP_404_NOT_FOUND
+            )
+        mla = request.data.get("mla_reference")
+        apa = request.data.get("apa_reference")
+        chicago = request.data.get("chicago_reference")
+        vancouver = request.data.get("vancouver_reference")
+
+        if not mla or not apa or not chicago or not vancouver:
+            return Response(
+                {"detail": "[mla, apa, chicago, vancouver] one or more fields missing."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        paperinfo.mla_reference = mla
+        paperinfo.apa_reference = apa
+        paperinfo.chicago_reference = chicago
+        paperinfo.vancouver_reference = vancouver
+
+        paperinfo.save()
+        serializer = PaperInfoSerializer(instance=paperinfo)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class PaperInfoListView(APIView):
         @swagger_auto_schema(
