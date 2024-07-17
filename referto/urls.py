@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from account.views import SigninView, SignupView, UserInfoView
+from account.views import SigninView, SignupView, UserInfoView, naver_login, naver_callback
 from papers.views import PaperUploadView
 from memos.views import MemoDetailView
 from assignments.views import AssignmentListView, AssignmentDetailView
@@ -64,6 +64,9 @@ urlpatterns = [
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
     path('api/auth/social/', include('allauth.socialaccount.urls')),
+
+    path('accounts/naver/login/', naver_login, name='naver_login'),
+    path('accounts/naver/callback/', naver_callback, name='naver_callback'),
 
 ]
 
