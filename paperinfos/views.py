@@ -130,6 +130,19 @@ class ProcessPaperInfo(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+    @swagger_auto_schema(
+        operation_id="PaperInfo 삭제",
+        operation_description="PaperInfo를 삭제합니다.",
+        responses={
+            204: "No Content",
+            400: "Bad Request",
+            404: "Not Found",
+        },
+        manual_parameters=[
+            openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
+        ]
+    )
+
     def delete(self, request, paper_id):
         try:
             paperInfo_id = paper_id
@@ -141,6 +154,15 @@ class ProcessPaperInfo(APIView):
         paperinfo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+    @swagger_auto_schema(
+        operation_id="PaperInfo 수정",
+        operation_description="PaperInfo 를 수정합니다.",
+        responses={
+            200: PaperInfoSerializer,
+            400: "Bad Request",
+            404: "Not Found",
+        }
+    )
     def put(self, request, paper_id):
         try:
             paperInfo_id = paper_id
