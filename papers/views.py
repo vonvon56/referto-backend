@@ -61,11 +61,11 @@ class PaperDetailView(generics.GenericAPIView):
             openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
         ]
     )
-    def delete(self, request, pk, *args, **kwargs):
-        user = request.user
-        paper = self.get_paper(pk, user)
-        if not paper:
-            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+    def delete(self, request, paper_id):
+        try:
+            paper = Paper.objects.get(paper_id=paper_id)
+        except:
+            return Response({"detail":"Paper not found."}, status=status.HTTP_404_NOT_FOUND)
 
         paper.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
