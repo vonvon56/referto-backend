@@ -48,8 +48,27 @@ class PaperUploadView(generics.GenericAPIView):
 
 
 
-# class PaperDetailView(generics.GenericAPIView):
-#     permission_classes = [IsAuthenticated]
+class PaperDetailView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_description="특정 Paper를 삭제합니다.",
+        responses={
+            204: 'No Content',
+            404: 'Not Found'
+        },
+        manual_parameters=[
+            openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
+        ]
+    )
+    def delete(self, request, paper_id):
+        try:
+            paper = Paper.objects.get(paper_id=paper_id)
+        except:
+            return Response({"detail":"Paper not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        paper.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 #     def get_paper(self, pk, user):
 #         try:
@@ -59,26 +78,6 @@ class PaperUploadView(generics.GenericAPIView):
 #             return paper
 #         except Paper.DoesNotExist:
 #             return None
-
-#     # pdf 파일을 수정이나 삭제하는 기능은 아직 없음
-#     @swagger_auto_schema(
-#         operation_description="특정 Paper를 삭제합니다.",
-#         responses={
-#             204: 'No Content',
-#             404: 'Not Found'
-#         },
-#         manual_parameters=[
-#             openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
-#         ]
-#     )
-#     def delete(self, request, pk, *args, **kwargs):
-#         user = request.user
-#         paper = self.get_paper(pk, user)
-#         if not paper:
-#             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
-
-#         paper.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
     
 #     @swagger_auto_schema(
 #         operation_description="특정 Paper를 수정합니다.",
