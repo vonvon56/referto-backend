@@ -123,21 +123,28 @@ class AssignmentDetailView(generics.GenericAPIView):
         assignment.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-
+    @swagger_auto_schema(
+            operation_description="특정 Assignment를 가져옵니다.",
+            responses={200: AssignmentSerializer},
+            manual_parameters=[
+            openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
+        ]
+        )
+    def get(self, request, pk, *args, **kwargs):
+        user = self.request.user
+        try:
+            assignment = Assignment.objects.get(pk=pk, user=user)
+        except Assignment.DoesNotExist:
+            return Response({"message": "Assignment not found or not yours"}, status=status.HTTP_404_NOT_FOUND)
+        
+        # if assignment.user != request.user:
+        #     raise PermissionDenied("You do not have permission to view this assignment.")
+        serializer = AssignmentSerializer(assignment)
+        return Response(serializer.data)
+    
 # class AssignmentDetailView(generics.GenericAPIView):
 #     queryset = Assignment.objects.all()
 #     serializer_class = AssignmentSerializer
-
-#     @swagger_auto_schema(
-#         operation_description="특정 Assignment를 가져옵니다.",
-#         responses={200: AssignmentSerializer}
-#     )
-#     def get(self, request, *args, **kwargs):
-#         assignment = self.get_object()
-#         if assignment.user != request.user:
-#             raise PermissionDenied("You do not have permission to view this assignment.")
-#         serializer = AssignmentSerializer(assignment)
-#         return Response(serializer.data)
 
 #     @swagger_auto_schema(
 #         operation_description="특정 Assignment를 업데이트합니다.",
