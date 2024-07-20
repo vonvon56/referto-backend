@@ -4,5 +4,5 @@ from .models import PaperInfo
 class PaperInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = PaperInfo
-        fields = ['paperInfo_id', 'mla_reference', 'apa_reference', 'chicago_reference', 'vancouver_reference', 'paper']
+        fields = ['paperInfo_id', 'MLA', 'APA', 'Chicago', 'Vancouver', 'paper']
         read_only_fields = ['paper']
