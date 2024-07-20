@@ -4,6 +4,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 
 from .models import Memo, Paper
 from .serializers import MemoSerializer
@@ -45,6 +47,27 @@ class MemoDetailView(generics.GenericAPIView):
 
         serializer = self.serializer_class(memo)
         return Response(serializer.data)
+    
+    @swagger_auto_schema(
+        operation_id="메모 추가",
+        operation_description="새로운 메모를 추가합니다.",
+        responses={
+            201: "Created", 404: "Not Found", 400: "Bad Request"
+        }
+    )
+    def post(self, request, paper_id):
+        paper = get_object_or_404(Paper, paper_id=paper_id)
+
+        if not paper.pdf:
+            return Response({"error": "PDF file not found."}, status=status.HTTP_404_NOT_FOUND)
+        content = request.data.get("content")
+
+        if not content:
+            return Response({"detail":"[content] field missing."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        memo = Memo.objects.create(content=content, paper=paper)
+        serializer = MemoSerializer(memo)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
         operation_description="해당 메모를 수정하거나 없으면 생성합니다.",

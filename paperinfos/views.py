@@ -201,6 +201,11 @@ class PaperInfoListView(APIView):
             }
         )
         def get(self, request, assignment_id):
+            if(assignment_id == 0):
+                paperinfos = PaperInfo.objects.all()
+                serializer = PaperInfoSerializer(paperinfos, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            
             assignment = get_object_or_404(Assignment, assignment_id=assignment_id)
             
             if not Paper.objects.filter(assignment=assignment).exists():
