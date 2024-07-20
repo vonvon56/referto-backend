@@ -51,6 +51,7 @@ class PaperUploadView(generics.GenericAPIView):
 # class PaperDetailView(generics.GenericAPIView):
 #     permission_classes = [IsAuthenticated]
 
+
 #     def get_paper(self, pk, user):
 #         try:
 #             paper = Paper.objects.select_related('assignment').get(pk=pk)

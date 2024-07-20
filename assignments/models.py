@@ -3,10 +3,10 @@ from django.contrib.auth.models import User
 
 class Assignment(models.Model):
     # 저장되는 값
-    APA = 'apa'
-    CHICAGO = 'chicago'
-    VANCOUVER = 'vancouver'
-    MLA = 'mla'
+    APA = 'APA'
+    CHICAGO = 'Chicago'
+    VANCOUVER = 'Vancouver'
+    MLA = 'MLA'
     # 선택지로 제공되는 값
     REFERENCE_CHOICES = [
         (APA, 'APA'),
