@@ -55,8 +55,8 @@ class MemoDetailView(generics.GenericAPIView):
             201: "Created", 404: "Not Found", 400: "Bad Request"
         }
     )
-    def post(self, request, paper_id):
-        paper = get_object_or_404(Paper, paper_id=paper_id)
+    def post(self, request, pk):
+        paper = get_object_or_404(Paper, paper_id=pk)
 
         if not paper.pdf:
             return Response({"error": "PDF file not found."}, status=status.HTTP_404_NOT_FOUND)
