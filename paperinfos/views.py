@@ -106,10 +106,10 @@ class ProcessPaperInfo(APIView):
             paper_info_instance, created = PaperInfo.objects.update_or_create(
                 paper=paper,
                 defaults={
-                    'mla_reference': paper_info_list[1],
-                    'apa_reference': paper_info_list[3],
-                    'chicago_reference': paper_info_list[5],
-                    'vancouver_reference': paper_info_list[7]
+                    'MLA': paper_info_list[1],
+                    'APA': paper_info_list[3],
+                    'Chicago': paper_info_list[5],
+                    'Vancouver': paper_info_list[7]
                 }
             )
             serializer = PaperInfoSerializer(paper_info_instance)
@@ -171,20 +171,20 @@ class ProcessPaperInfo(APIView):
             return Response(
                 {"detail": "PaperInfo Not found."}, status=status.HTTP_404_NOT_FOUND
             )
-        mla = request.data.get("mla_reference")
-        apa = request.data.get("apa_reference")
-        chicago = request.data.get("chicago_reference")
-        vancouver = request.data.get("vancouver_reference")
+        MLA = request.data.get("MLA")
+        APA = request.data.get("APA")
+        Chicago = request.data.get("Chicago")
+        Vancouver = request.data.get("Vancouver")
 
-        if not mla or not apa or not chicago or not vancouver:
+        if not MLA or not APA or not Chicago or not Vancouver:
             return Response(
                 {"detail": "[mla, apa, chicago, vancouver] one or more fields missing."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        paperinfo.mla_reference = mla
-        paperinfo.apa_reference = apa
-        paperinfo.chicago_reference = chicago
-        paperinfo.vancouver_reference = vancouver
+        paperinfo.MLA = MLA
+        paperinfo.APA = APA
+        paperinfo.Chicago = Chicago
+        paperinfo.Vancouver = Vancouver
 
         paperinfo.save()
         serializer = PaperInfoSerializer(instance=paperinfo)

@@ -70,6 +70,7 @@ class PaperDetailView(generics.GenericAPIView):
         paper.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+
 #     def get_paper(self, pk, user):
 #         try:
 #             paper = Paper.objects.select_related('assignment').get(pk=pk)
