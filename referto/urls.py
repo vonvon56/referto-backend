@@ -55,7 +55,7 @@ urlpatterns = [
     path('api/assignments/<int:pk>/', AssignmentDetailView.as_view(), name='assignment-detail'),
 
     path('api/papers/', PaperUploadView.as_view(), name='paper-upload'),
-    path('api/papers/<int:paper_id>/', PaperDetailView.as_view(), name='paper-delete'),
+    path('api/papers/<int:pk>/', PaperDetailView.as_view(), name='paper-detail'),
 
     path('api/papers/<int:pk>/memo/', MemoDetailView.as_view(), name='memo'),
 
