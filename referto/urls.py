@@ -16,8 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from account.views import SigninView, SignupView, UserInfoView, naver_login, naver_callback
-from papers.views import PaperUploadView
+from account.views import SigninView, SignupView, UserInfoView
+from papers.views import PaperUploadView, PaperDetailView
 from memos.views import MemoDetailView
 from assignments.views import AssignmentListView, AssignmentDetailView
 from rest_framework import permissions
@@ -55,6 +55,7 @@ urlpatterns = [
     path('api/assignments/<int:pk>/', AssignmentDetailView.as_view(), name='assignment-detail'),
 
     path('api/papers/', PaperUploadView.as_view(), name='paper-upload'),
+    path('api/papers/<int:paper_id>/', PaperDetailView.as_view(), name='paper-delete'),
 
     path('api/papers/<int:pk>/memo/', MemoDetailView.as_view(), name='memo'),
 
@@ -64,9 +65,6 @@ urlpatterns = [
     path('api/auth/', include('dj_rest_auth.urls')),
     path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
     path('api/auth/social/', include('allauth.socialaccount.urls')),
-
-    path('accounts/naver/login/', naver_login, name='naver_login'),
-    path('accounts/naver/callback/', naver_callback, name='naver_callback'),
 
 ]
 
