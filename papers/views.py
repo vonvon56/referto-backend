@@ -105,24 +105,30 @@ class PaperDetailView(generics.GenericAPIView):
 #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-#     # pdf 파일을 개별 조회 후 다운로드 하는 기능 아직 없음
-#     @swagger_auto_schema(
-#         operation_description="특정 Paper를 조회합니다.",
-#         responses={
-#             200: 'application/pdf',
-#             404: 'Not Found'
-#         },
-#         manual_parameters=[
-#             openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
-#         ]
-#     )
-#     def get(self, request, pk, *args, **kwargs):
-#         user = request.user
-#         paper = self.get_paper(pk, user)
-#         if not paper:
-#             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+    @swagger_auto_schema(
+        operation_description="특정 Paper를 조회합니다.",
+        responses={
+            200: 'application/pdf',
+            404: 'Not Found'
+        },
+        manual_parameters=[
+            openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
+        ]
+    )
+        
+    def get(self, request, pk, *args, **kwargs):
+        paper = self.get_paper(pk)
+        if not paper:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-#         file_handle = paper.pdf.open()
-#         response = FileResponse(file_handle, content_type='application/pdf')
-#         response['Content-Disposition'] = f'attachment; filename="{paper.pdf.name}"'
-#         return response
+        file_handle = paper.pdf.open()
+        response = FileResponse(file_handle, content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="{paper.pdf.name}"'
+        return response
+    
+    def get_paper(self, pk):
+        try:
+            paper = Paper.objects.get(pk=pk)
+            return paper
+        except Paper.DoesNotExist:
+            return None
