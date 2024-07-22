@@ -45,4 +45,6 @@ urlpatterns = [
     path('api/papers/', include('papers.urls')),
     # paperinfos
     path('api/paperinfo/', include('paperinfos.urls')),
+    # memos
+    path('api/papers/', include('memos.urls')),
 ]
