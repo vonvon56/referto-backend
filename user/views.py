@@ -156,9 +156,8 @@ from allauth.socialaccount.models import SocialAccount
 
 # 구글 소셜로그인 변수 설정
 state = os.environ.get("STATE")
-BASE_URL = 'http://localhost:8000/'
-# GOOGLE_CALLBACK_URI = BASE_URL + 'api/user/google/callback/'
-GOOGLE_CALLBACK_URI = 'http://127.0.0.1:8000/api/user/google/callback/'
+BASE_URL = 'http://127.0.0.1:8000/'
+GOOGLE_CALLBACK_URI = BASE_URL + 'api/user/google/callback/'
 # 구글 로그인
 def google_login(request):
     scope = "https://www.googleapis.com/auth/userinfo.email"
@@ -179,9 +178,7 @@ def google_callback(request):
   
     ### 1-1. json으로 변환 & 에러 부분 파싱
     token_req_json = token_req.json()
-    print('나온 것', token_req_json)
     error = token_req_json.get("error")
-    print('error: ', error)
     ### 1-2. 에러 발생 시 종료
     if error is not None:
         raise JSONDecodeError(error)
@@ -235,9 +232,9 @@ def google_callback(request):
         # 전달받은 이메일로 기존에 가입된 유저가 아예 없으면 => 새로 회원가입 & 해당 유저의 jwt 발급
         data = {'access_token': access_token, 'code': code}
 
-        accept = requests.post("http://127.0.0.1:8000/api/user/google/login/finish/", data=json.dumps(data), headers={'Content-Type': 'application/json'})
+        accept = requests.post("http://127.0.0.1:8000/api/user/google/login/finish/", data=data)
         accept_status = accept.status_code
-        print('data: ', json.dumps(data), type(json.dumps(data)))
+        print('data: ', json.dumps(data))
         print(accept_status)
         # 뭔가 중간에 문제가 생기면 에러
         if accept_status != 200:

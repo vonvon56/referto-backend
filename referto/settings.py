@@ -90,7 +90,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
     
     
 ]
@@ -101,23 +100,22 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-# SOCIALACCOUNT_PROVIDERS = {
-#     'google': {
-        # 'SCOPE': [
-        #     'profile',
-        #     'email',
-        # ],
-        # 'AUTH_PARAMS': {
-        #     'access_type': 'online',
-        # },
-        # 'OAUTH_PKCE_ENABLED': True,
-#         'APP': {
-#             'client_id': os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID"),
-#             'secret': os.environ.get("SOCIAL_AUTH_GOOGLE_SECRET"),
-#             'key': ''
-#         }
-#     }
-# }
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'APP': {
+            'client_id': os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID"),
+            'secret': os.environ.get("SOCIAL_AUTH_GOOGLE_SECRET"),
+            'key': ''
+        }
+    }
+}
 
 ROOT_URLCONF = 'referto.urls'
 
