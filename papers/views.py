@@ -61,7 +61,8 @@ class PaperDetailView(generics.GenericAPIView):
             openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
         ]
     )
-    def delete(self, request, paper_id):
+    def delete(self, request, *args, **kwargs):
+        paper_id = kwargs.get('pk')
         try:
             paper = Paper.objects.get(paper_id=paper_id)
         except:
