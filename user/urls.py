@@ -1,5 +1,5 @@
 from .views import *
-from django.urls import path
+from django.urls import path, include
 from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
@@ -12,4 +12,6 @@ urlpatterns = [
     path('google/callback/', google_callback, name='google_callback'),
     path('google/login/finish/', GoogleLogin.as_view(), name='google_login_todjango'),
 
+    # assignments
+    path('api/assignments/', include('assignments.urls')),
 ]
