@@ -15,6 +15,8 @@ import time
 from openai.error import OpenAIError, RateLimitError, InvalidRequestError  # 여기서 예외 클래스 가져오기
 from rest_framework.permissions import IsAuthenticated
 from paperinfos.serializers import PaperInfoSerializer
+from .request_serializers import PaperInfoChangeSerializer
+
 # OpenAI API 키 설정
 openai.api_key = settings.OPENAI_API_KEY
 
@@ -156,39 +158,38 @@ class ProcessPaperInfo(APIView):
     
     @swagger_auto_schema(
         operation_id="PaperInfo 수정",
-        operation_description="PaperInfo 를 수정합니다.",
+        operation_description="PaperInfo를 이용자가 수정합니다.",
         responses={
             200: PaperInfoSerializer,
             400: "Bad Request",
             404: "Not Found",
-        }
+        },
+        request_body=PaperInfoChangeSerializer,
+        manual_parameters=[
+            openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
+        ]
     )
     def put(self, request, paper_id):
+        serializer = PaperInfoChangeSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        reference_type = serializer.validated_data['reference_type']
+        new_reference = serializer.validated_data['new_reference']
+
         try:
-            paperInfo_id = paper_id
-            paperinfo = PaperInfo.objects.get(paperInfo_id=paperInfo_id)
-        except:
-            return Response(
-                {"detail": "PaperInfo Not found."}, status=status.HTTP_404_NOT_FOUND
-            )
-        MLA = request.data.get("MLA")
-        APA = request.data.get("APA")
-        Chicago = request.data.get("Chicago")
-        Vancouver = request.data.get("Vancouver")
+            paperinfo = PaperInfo.objects.get(paperInfo_id=paper_id)
+        except PaperInfo.DoesNotExist:
+            return Response({"detail": "PaperInfo Not found."}, status=status.HTTP_404_NOT_FOUND)
 
-        if not MLA or not APA or not Chicago or not Vancouver:
-            return Response(
-                {"detail": "[mla, apa, chicago, vancouver] one or more fields missing."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        paperinfo.MLA = MLA
-        paperinfo.APA = APA
-        paperinfo.Chicago = Chicago
-        paperinfo.Vancouver = Vancouver
+        if reference_type not in ['MLA', 'APA', 'Chicago', 'Vancouver']:
+            return Response({"detail": "Invalid reference type."}, status=status.HTTP_400_BAD_REQUEST)
 
+        setattr(paperinfo, reference_type, new_reference)
         paperinfo.save()
-        serializer = PaperInfoSerializer(instance=paperinfo)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+
+        response_serializer = PaperInfoSerializer(paperinfo)
+        return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
 class PaperInfoListView(APIView):
