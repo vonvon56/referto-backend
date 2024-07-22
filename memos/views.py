@@ -52,19 +52,17 @@ class MemoDetailView(generics.GenericAPIView):
         operation_id="메모 추가",
         operation_description="새로운 메모를 추가합니다.",
         responses={
-            201: "Created", 404: "Not Found", 400: "Bad Request"
+            201: "Created", 404: "Not Found"
         }
     )
-    def post(self, request, pk):
-        paper = get_object_or_404(Paper, paper_id=pk)
+    def post(self, request, *args, **kwargs):
+        paper_id = kwargs.get('pk')
+        paper = get_object_or_404(Paper, paper_id=paper_id)
 
         if not paper.pdf:
             return Response({"error": "PDF file not found."}, status=status.HTTP_404_NOT_FOUND)
-        content = request.data.get("content")
+        content = ""
 
-        if not content:
-            return Response({"detail":"[content] field missing."}, status=status.HTTP_400_BAD_REQUEST)
-        
         memo = Memo.objects.create(content=content, paper=paper)
         serializer = MemoSerializer(memo)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
