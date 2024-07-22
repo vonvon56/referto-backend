@@ -42,6 +42,7 @@ urlpatterns = [
     # assignments
     path('api/assignments/', include('assignments.urls')),
     # papers
-    # assignments
     path('api/papers/', include('papers.urls')),
+    # paperinfos
+    path('api/paperinfo/', include('paperinfos.urls')),
 ]

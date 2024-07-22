@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'user',
     'assignments',
     'papers',
+    'paperinfos',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
