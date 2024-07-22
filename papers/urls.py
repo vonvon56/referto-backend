@@ -20,5 +20,6 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('', PaperUploadView.as_view(), name='paper-upload'),
-    path('<int:pk>/', PaperDetailView.as_view(), name='paper-detail')
+    path('<int:pk>/', PaperDetailView.as_view(), name='paper-detail'),
+    path('<int:pk>/number/', PaperNumberView.as_view(), name='paper-number'),
 ]

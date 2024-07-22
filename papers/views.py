@@ -90,3 +90,25 @@ class PaperDetailView(generics.GenericAPIView):
             return paper
         except Paper.DoesNotExist:
             return None
+        
+class PaperNumberView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+
+    @swagger_auto_schema(
+        operation_id='Paper 번호 로드',
+        operation_description="Paper의 번호를 가져옵니다. paper_id와는 별개입니다.",
+        responses={
+            204: 'No Content',
+            404: 'Not Found'
+        },
+        manual_parameters=[
+            openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING)
+        ]
+    )
+    def get(self, request, pk):
+        try:
+            paper = Paper.objects.get(paper_id=pk)
+        except:
+            return Response({"detail":"Paper not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({"number": paper.number}, status=status.HTTP_200_OK)
