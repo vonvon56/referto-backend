@@ -62,26 +62,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'django.contrib.sites',
     'user',
-    'assignments',
-    'papers',
-    'paperinfos',
-    'memos',
     'assignments',
     'papers',
     'paperinfos',
     'memos',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_framework.authtoken',
     'rest_framework_simplejwt',
-    'dj_rest_auth',
-    'dj_rest_auth.registration',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'allauth',
@@ -157,9 +145,8 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
-    # 'allauth.account.middleware.AccountMiddleware',
     
-]
+
 
 AUTHENTICATION_BACKENDS = (
     # 'social_core.backends.google.GoogleOAuth2',
