@@ -35,7 +35,7 @@ SECRET_KEY =env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev','localhost']
 
 
 # Application definition
@@ -47,24 +47,43 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'user',
+    'assignments',
+    'papers',
+    'paperinfos',
+    'memos',
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
     'drf_yasg',
 ]
-
+SITE_ID = 1
 AUTH_USER_MODEL = 'user.User'
+
+REST_USE_JWT = True
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None # username 필드 사용 x
+ACCOUNT_EMAIL_REQUIRED = True            # email 필드 사용 o
+ACCOUNT_USERNAME_REQUIRED = False        # username 필드 사용 x
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 # jwt 토큰은 simplejwt의 JWTAuthentication으로 인증한다.
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ), 
-    'DEFAULT_PERMISSION_CLASSES': (
+    # 'DEFAULT_PERMISSION_CLASSES': (
         # 'rest_framework.permissions.IsAuthenticated', # 인증된 사용자만 접근
         # 'rest_framework.permissions.IsAdminUser', # 관리자만 접근
-        'rest_framework.permissions.AllowAny', # 누구나 접근
-    )
+        # 'rest_framework.permissions.AllowAny', # 누구나 접근
+    # )
 }
 
 MIDDLEWARE = [
@@ -75,7 +94,32 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'allauth.account.middleware.AccountMiddleware',
+    
 ]
+
+AUTHENTICATION_BACKENDS = (
+    # 'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+)
+
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'APP': {
+            'client_id': os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID"),
+            'secret': os.environ.get("SOCIAL_AUTH_GOOGLE_SECRET"),
+            'key': ''
+        }
+    }
+}
 
 ROOT_URLCONF = 'referto.urls'
 
