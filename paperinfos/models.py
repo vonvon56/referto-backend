@@ -7,7 +7,6 @@ class PaperInfo(models.Model):
     APA = models.TextField(null=True, blank=True)
     Chicago = models.TextField(null=True, blank=True)
     Vancouver = models.TextField(null=True, blank=True)
-    # reference = models.TextField(null=True, blank=True)
     paper = models.OneToOneField(Paper, on_delete=models.CASCADE)  # 문서와의 관계 설정
 
     def __str__(self):

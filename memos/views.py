@@ -15,6 +15,7 @@ class MemoDetailView(generics.GenericAPIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
+        operation_id='Memo 로드',
         operation_description="해당 메모를 가져옵니다.",
         responses={200: MemoSerializer()},
         manual_parameters=[
@@ -68,6 +69,7 @@ class MemoDetailView(generics.GenericAPIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @swagger_auto_schema(
+        operation_id="Memo 수정",
         operation_description="해당 메모를 수정하거나 없으면 생성합니다.",
         responses={200: MemoSerializer()},
         manual_parameters=[

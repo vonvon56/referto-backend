@@ -2,6 +2,7 @@
 # Edit at https://www.toptal.com/developers/gitignore?templates=django
 
 ### Django ###
+*.pdf
 *.log
 *.pot
 *.pyc
@@ -171,6 +172,4 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-# End of https://www.toptal.com/developers/gitignore/api/django 
-
-*.pdf
+# End of https://www.toptal.com/developers/gitignore/api/django

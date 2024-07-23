@@ -1,7 +1,4 @@
-import fitz  # PyMuPDF
-import openai
-import json
-import re
+import re, os, json, openai, fitz
 from django.shortcuts import get_object_or_404
 from django.conf import settings
 from rest_framework.views import APIView
@@ -11,14 +8,12 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import Paper, PaperInfo
 from assignments.models import Assignment
-import time
 from openai.error import OpenAIError, RateLimitError, InvalidRequestError  # 여기서 예외 클래스 가져오기
 from rest_framework.permissions import IsAuthenticated
-from paperinfos.serializers import PaperInfoSerializer
+from .serializers import PaperInfoSerializer
 from .request_serializers import PaperInfoChangeSerializer
-
 # OpenAI API 키 설정
-openai.api_key = settings.OPENAI_API_KEY
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 # PDF 파일의 특정 페이지 텍스트 추출 함수
 def extract_text_from_pdf(pdf_path, start_page, end_page):
@@ -33,8 +28,10 @@ def extract_text_from_pdf(pdf_path, start_page, end_page):
 def extract_info_from_text(pdf_text):
     prompt = f"""다음은 네가 인용문을 써줄 학술 논문이야.: {pdf_text}
     
+제발 좀 한국어로 적힌 논문은 저자명, 제목, 저널명 모두 한국어로 쓰라고!!!!!
+제발 좀 한국어로 적힌 논문은 저자명, 제목, 저널명 모두 한국어로 쓰라고!!!!!
+영어로 읽은 다음 번역하지 말고, 한국어 그대로를 갖다 써!
 MLA, APA, Chicago, Vancouver 형식으로 인용을 한 줄씩 순서대로 써줘. 한국어 논문 저자명과 제목은 한국어로, 영어 논문은 영어로 써야 해.
-
 다음은 한국어 논문 인용의 예시야. 정확히 이런 형식이어야 해. 제발 좀 한국어 논문은 한국어로 쓰라고!!!!!
 
 MLA:
@@ -62,6 +59,9 @@ Hassabis D, Kumaran D, Summerﬁeld C, Botvinick M. Neuroscience-Inspired Artifi
 
 제발 형식을 꼭 지켜서, 각 인용문을 한 줄씩 MLA, APA, Chicago, Vancouver 순서대로 정확히 만들어줘.
 제발 좀 한국어 논문은 저자명, 제목, 저널명 모두 한국어로 쓰라고!!!!!
+제발 좀 한국어 논문은 저자명, 제목, 저널명 모두 한국어로 쓰라고!!!!!
+제발 좀 한국어 논문은 저자명, 제목, 저널명 모두 한국어로 쓰라고!!!!!
+영어로 읽은 다음 번역하지 말고, 한국어 그대로를 갖다 써!
 """
 
     response = openai.ChatCompletion.create(
@@ -79,7 +79,8 @@ class ProcessPaperInfo(APIView):
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_description="Extract paper info",
+        operation_id="PaperInfo 생성",
+        operation_description="Paper 파일로부터 PaperInfo(인용)을 추출합니다.",
         responses={200: 'PaperInfo created successfully or updated successfully.'},
         manual_parameters=[
             openapi.Parameter(
@@ -90,7 +91,6 @@ class ProcessPaperInfo(APIView):
             )
         ]
     )
-    
     def post(self, request, paper_id):
         paper = get_object_or_404(Paper, paper_id=paper_id)
         if not paper.pdf:
@@ -156,6 +156,9 @@ class ProcessPaperInfo(APIView):
         paperinfo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
+    serializer_class = PaperInfoChangeSerializer
+    permission_classes = [IsAuthenticated]
+
     @swagger_auto_schema(
         operation_id="PaperInfo 수정",
         operation_description="PaperInfo를 이용자가 수정합니다.",
@@ -193,9 +196,10 @@ class ProcessPaperInfo(APIView):
 
 
 class PaperInfoListView(APIView):
+        permission_classes = [IsAuthenticated]
         @swagger_auto_schema(
             operation_id="PaperInfo 목록 조회",
-            operation_description="참고문헌 목록을 조회합니다.",
+            operation_description="해당 Assignment의 참고문헌 목록을 조회합니다.",
             responses={
                 200: PaperInfoSerializer(many=True),
                 404: "Not Found",
@@ -222,3 +226,28 @@ class PaperInfoListView(APIView):
                 return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
             
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+class PaperInfoDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        operation_id="PaperInfo 조회",
+        operation_description="PaperInfo 하나를 조회합니다.",
+        responses={
+            200: PaperInfoSerializer,
+            404: "Not Found",
+        },
+        manual_parameters=[
+            openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING),
+        ]
+    )
+    def get(self, request, assignment_id, paper_id):
+        try:
+            assignment = get_object_or_404(Assignment, assignment_id=assignment_id)
+            papers = Paper.objects.filter(assignment=assignment)
+            paper = Paper.objects.get(paper_id=paper_id)
+            paperinfo = PaperInfo.objects.get(paper=paper)
+            serializer = PaperInfoSerializer(paperinfo)
+        except:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
