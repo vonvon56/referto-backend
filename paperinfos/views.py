@@ -189,10 +189,12 @@ class ProcessPaperInfo(APIView):
         paperinfo.save()
 
         response_serializer = PaperInfoSerializer(paperinfo)
+        #return Response(new_reference, status=status.HTTP_200_OK)
         return Response(response_serializer.data, status=status.HTTP_200_OK)
 
 
 class PaperInfoListView(APIView):
+        permission_classes = [IsAuthenticated]
         @swagger_auto_schema(
             operation_id="PaperInfo 목록 조회",
             operation_description="참고문헌 목록을 조회합니다.",
@@ -222,3 +224,28 @@ class PaperInfoListView(APIView):
                 return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
             
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+class PaperInfoDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        operation_id="PaperInfo 조회",
+        operation_description="PaperInfo 하나를 조회합니다.",
+        responses={
+            200: PaperInfoSerializer,
+            404: "Not Found",
+        },
+        manual_parameters=[
+            openapi.Parameter("Authorization", openapi.IN_HEADER, description="access token", type=openapi.TYPE_STRING),
+        ]
+    )
+    def get(self, request, assignment_id, paper_id):
+        try:
+            assignment = get_object_or_404(Assignment, assignment_id=assignment_id)
+            papers = Paper.objects.filter(assignment=assignment)
+            paper = Paper.objects.get(paper_id=paper_id)
+            paperinfo = PaperInfo.objects.get(paper=paper)
+            serializer = PaperInfoSerializer(paperinfo)
+        except:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        return Response(serializer.data, status=status.HTTP_200_OK)
