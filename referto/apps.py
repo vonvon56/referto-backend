@@ -1,4 +1,3 @@
-# referto/apps.py
 from django.apps import AppConfig
 
 class RefertoConfig(AppConfig):
