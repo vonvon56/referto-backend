@@ -35,16 +35,16 @@ class RegisterAPIView(APIView):
                     "user": serializer.data,
                     "message": "register successs",
                     "token": {
-                        "access": access_token,
-                        "refresh": refresh_token,
+                        "access_token": access_token,
+                        "refresh_token": refresh_token,
                     },
                 },
                 status=status.HTTP_200_OK,
             )
             
             # jwt 토큰 => 쿠키에 저장
-            res.set_cookie("access", access_token, httponly=True)
-            res.set_cookie("refresh", refresh_token, httponly=True)
+            res.set_cookie("access_token", access_token)
+            res.set_cookie("refresh_token", refresh_token)
             
             return res
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -60,7 +60,7 @@ class AuthAPIView(APIView):
     def get(self, request):
         try:
             # access token을 decode 해서 유저 id 추출 => 유저 식별
-            access = request.COOKIES['access']
+            access = request.COOKIES['access_token']
             payload = jwt.decode(access, SECRET_KEY, algorithms=['HS256'])
             pk = payload.get('user_id')
             user = get_object_or_404(User, pk=pk)
@@ -69,18 +69,18 @@ class AuthAPIView(APIView):
 
         except(jwt.exceptions.ExpiredSignatureError):
             # 토큰 만료 시 토큰 갱신
-            data = {'refresh': request.COOKIES.get('refresh', None)}
+            data = {'refresh_token': request.COOKIES.get('refresh_token', None)}
             serializer = TokenRefreshSerializer(data=data)
             if serializer.is_valid(raise_exception=True):
-                access = serializer.data.get('access', None)
-                refresh = serializer.data.get('refresh', None)
+                access = serializer.data.get('access_token', None)
+                refresh = serializer.data.get('refresh_token', None)
                 payload = jwt.decode(access, SECRET_KEY, algorithms=['HS256'])
                 pk = payload.get('user_id')
                 user = get_object_or_404(User, pk=pk)
                 serializer = UserSerializer(instance=user)
                 res = Response(serializer.data, status=status.HTTP_200_OK)
-                res.set_cookie('access', access)
-                res.set_cookie('refresh', refresh)
+                res.set_cookie('access_token', access)
+                res.set_cookie('refresh_token', refresh)
                 return res
             raise jwt.exceptions.InvalidTokenError
 
@@ -112,15 +112,15 @@ class AuthAPIView(APIView):
                     "user": serializer.data,
                     "message": "login success",
                     "token": {
-                        "access": access_token,
-                        "refresh": refresh_token,
+                        "access_token": access_token,
+                        "refresh_token": refresh_token,
                     },
                 },
                 status=status.HTTP_200_OK,
             )
             # jwt 토큰 => 쿠키에 저장
-            res.set_cookie("access", access_token, httponly=True)
-            res.set_cookie("refresh", refresh_token, httponly=True)
+            res.set_cookie("access_token", access_token)
+            res.set_cookie("refresh_token", refresh_token)
             return res
         else:
             return Response(status=status.HTTP_400_BAD_REQUEST)
@@ -136,8 +136,8 @@ class AuthAPIView(APIView):
         response = Response({
             "message": "Logout success"
             }, status=status.HTTP_202_ACCEPTED)
-        response.delete_cookie("access")
-        response.delete_cookie("refresh")
+        response.delete_cookie("access_token")
+        response.delete_cookie("refresh_token")
         return response
     
 # -------------- 구글 로그인 --------------------
