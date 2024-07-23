@@ -20,5 +20,5 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('', AssignmentListView.as_view(), name='assignment-list'),
-    path('<int:pk>/',  AssignmentDetailView.as_view(), name='assignment-detail')
+    path('<int:pk>/',  AssignmentDetailView.as_view(), name='assignment-detail'),
 ]
