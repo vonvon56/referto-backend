@@ -6,7 +6,6 @@ class Assignment(models.Model):
     CHICAGO = 'Chicago'
     VANCOUVER = 'Vancouver'
     MLA = 'MLA'
-
     REFERENCE_CHOICES = [
         (APA, 'APA'),
         (CHICAGO, 'Chicago'),
