@@ -133,12 +133,19 @@ class AuthAPIView(APIView):
     )
     def delete(self, request):
         # 쿠키에 저장된 토큰 삭제 => 로그아웃 처리
-        response = Response({
-            "message": "Logout success"
-            }, status=status.HTTP_202_ACCEPTED)
-        response.delete_cookie("access_token")
-        response.delete_cookie("refresh_token")
-        return response
+        if not request.user.is_authenticated:
+            return Response(
+                {"detail": "please signin"}, status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        refresh_token = request.data.get("refresh")
+        if not refresh_token:
+            return Response(
+                {"detail": "no refresh token"}, status=status.HTTP_400_BAD_REQUEST
+            )
+        RefreshToken(refresh_token).blacklist()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
 # -------------- 구글 로그인 --------------------
 import os
@@ -263,3 +270,38 @@ class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = 'http://127.0.0.1:8000/api/user/google/callback/'
     client_class = OAuth2Client
+
+# -------------- Access Token Refresh --------------------
+
+from rest_framework_simplejwt.tokens import RefreshToken
+
+class TokenRefreshView(APIView):
+    @swagger_auto_schema(
+        operation_id="토큰 재발급",
+        operation_description="access 토큰을 재발급 받습니다.",
+        request_body=TokenRefreshRequestSerializer,
+        responses={200: UserSerializer},
+    )
+    def post(self, request):
+        refresh_token = request.data.get("refresh")
+        
+        #Get user's refresh_token
+        if not refresh_token:
+            return Response(
+                {"detail": "no refresh token"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+        #Check if refresh_token is valid
+        #if invalid -- means user has to sign in again.
+            RefreshToken(refresh_token).verify()
+        except:
+            return Response(
+                {"detail": "please signin again."}, status=status.HTTP_401_UNAUTHORIZED
+            )
+            
+        #Since refresh_token is valid, create new access_token, embed into a cookie and send it over
+        new_access_token = str(RefreshToken(refresh_token).access_token)
+        response = Response({"detail": "token refreshed"}, status=status.HTTP_200_OK)
+        response.set_cookie("access_token", value=str(new_access_token), httponly=True)
+        return response
