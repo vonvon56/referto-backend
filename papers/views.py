@@ -14,7 +14,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 # pdf 파일 업로드 뷰
 class PaperUploadView(generics.GenericAPIView):
     serializer_class = PaperCreateSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     @swagger_auto_schema(
         operation_id='Paper 생성',
