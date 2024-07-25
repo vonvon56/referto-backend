@@ -303,5 +303,5 @@ class TokenRefreshView(APIView):
         #Since refresh_token is valid, create new access_token, embed into a cookie and send it over
         new_access_token = str(RefreshToken(refresh_token).access_token)
         response = Response({"detail": "token refreshed"}, status=status.HTTP_200_OK)
-        response.set_cookie("access_token", value=str(new_access_token), httponly=True)
+        response.set_cookie("access_token", new_access_token)
         return response
