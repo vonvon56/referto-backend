@@ -36,7 +36,6 @@ SECRET_KEY =env('SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev','localhost']
-ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev','localhost']
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',

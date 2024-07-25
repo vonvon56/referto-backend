@@ -274,8 +274,10 @@ class GoogleLogin(SocialLoginView):
 # -------------- Access Token Refresh --------------------
 
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.permissions import AllowAny
 
 class TokenRefreshView(APIView):
+    permission_classes = [AllowAny]
     @swagger_auto_schema(
         operation_id="토큰 재발급",
         operation_description="access 토큰을 재발급 받습니다.",
@@ -302,6 +304,6 @@ class TokenRefreshView(APIView):
             
         #Since refresh_token is valid, create new access_token, embed into a cookie and send it over
         new_access_token = str(RefreshToken(refresh_token).access_token)
-        response = Response({"detail": "token refreshed"}, status=status.HTTP_200_OK)
-        response.set_cookie("access_token", value=str(new_access_token), httponly=True)
+        response = Response({"access": new_access_token}, status=status.HTTP_200_OK)
+        response.set_cookie("access_token", new_access_token)
         return response

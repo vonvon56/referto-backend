@@ -1,6 +1,6 @@
-from .views import *
+from .views import RegisterAPIView, AuthAPIView, google_login, google_callback, GoogleLogin, TokenRefreshView
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenRefreshView
+#from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
     path("register/", RegisterAPIView.as_view()), # post - 회원가입
