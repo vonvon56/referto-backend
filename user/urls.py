@@ -1,4 +1,6 @@
-from .views import RegisterAPIView, AuthAPIView, google_login, google_callback, GoogleLogin, TokenRefreshView
+from .views import *
+from .naverlogin_views import *
+
 from django.urls import path, include
 #from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -11,4 +13,9 @@ urlpatterns = [
     path('google/login/', google_login, name='google_login'),
     path('google/callback/', google_callback, name='google_callback'),
     path('google/login/finish/', GoogleLogin.as_view(), name='google_login_todjango'),
+
+     # 네이버 소셜로그인
+    path('naver/login/', naver_login, name='google_login'),
+    path('naver/callback/', naver_callback, name='google_callback'),
+    path('naver/login/finish/', NaverLogin.as_view(), name='google_login_todjango'),
 ]

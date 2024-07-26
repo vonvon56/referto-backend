@@ -35,12 +35,15 @@ SECRET_KEY =env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev','localhost']
+
+ALLOWED_HOSTS = ['referto-backend', '127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev', 'https://referto-backend.fly.dev','localhost']
+
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
     "http://localhost:3000",
-    # "https://referto.site",
+    'https://referto-backend.fly.dev',
+    "https://referto.site",
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = (
@@ -52,8 +55,26 @@ CORS_ALLOW_HEADERS = (
     "x-requested-with",
 )
 # Application definition
+CSRF_TRUSTED_ORIGINS = [
+   'http://127.0.0.1:3000', 
+   'http://localhost:3000',
+   'https://referto-backend.fly.dev',
+]
+CORS_ORIGIN_ALLOW_ALL = False 
+# SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# Ensure that cookies are only sent via HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:3000' ,'http://localhost:3000', 'https://referto-backend.fly.dev','http://referto-backend.fly.dev']
 INSTALLED_APPS = [
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'allauth.socialaccount.providers.naver',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -72,13 +93,13 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
     'dj_rest_auth',
     'dj_rest_auth.registration',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
     'drf_yasg',
-    'corsheaders'
+    'corsheaders',
+    'whitenoise.runserver_nostatic', 
 ]
+
+# SECURE_SSL_REDIRECT = True  # HTTP 요청을 HTTPS로 리다이렉트
+
 SITE_ID = 1
 AUTH_USER_MODEL = 'user.User'
 
@@ -120,6 +141,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # 'allauth.account.middleware.AccountMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     
 ]
 
@@ -129,8 +151,10 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
+
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
+        'PROVIDER': 'allauth.socialaccount.providers.google.GoogleProvider',
         'SCOPE': [
             'profile',
             'email',
@@ -143,8 +167,16 @@ SOCIALACCOUNT_PROVIDERS = {
             'secret': os.environ.get("SOCIAL_AUTH_GOOGLE_SECRET"),
             'key': ''
         }
+    }, 
+    'naver': {
+        'APP': {
+            'client_id': os.environ.get('SOCIAL_AUTH_NAVER_CLIENT_ID'),
+            'secret': os.environ.get('SOCIAL_AUTH_NAVER_SECRET'),
+            'key': ''
+        }
     }
 }
+
     
 
 
@@ -188,6 +220,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'referto.wsgi.application'
 
@@ -270,7 +303,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
-
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # <-- Updated!
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # <-- Updated!
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
