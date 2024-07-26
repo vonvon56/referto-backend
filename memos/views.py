@@ -12,7 +12,7 @@ from .serializers import MemoSerializer
 
 class MemoDetailView(generics.GenericAPIView):
     serializer_class = MemoSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_id='Memo 로드',

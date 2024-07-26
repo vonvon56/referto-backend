@@ -13,7 +13,7 @@ from drf_yasg import openapi
 # post: 그 유저의 assignment 추가
 class AssignmentListView(generics.GenericAPIView):
     serializer_class = AssignmentSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_id="assignment 목록 로드",
@@ -49,7 +49,7 @@ class AssignmentListView(generics.GenericAPIView):
 
 class AssignmentDetailView(generics.GenericAPIView):
     serializer_class = AssignmentSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_id="assignment 수정",

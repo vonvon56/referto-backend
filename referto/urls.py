@@ -31,6 +31,7 @@ schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
+    # url='https://referto-backend.fly.dev',  # URL을 HTTPS로 설정합니다.
 )
 
 urlpatterns = [
