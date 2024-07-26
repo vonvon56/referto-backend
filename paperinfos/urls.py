@@ -16,9 +16,11 @@ schema_view = get_schema_view(
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
+    url='https://referto-backend.fly.dev',  # URL을 HTTPS로 설정합니다.
 )
 
 urlpatterns = [
     path('<int:paper_id>/', ProcessPaperInfo.as_view(), name='process_paper_info'), 
-    path('assignment/<int:assignment_id>/', PaperInfoListView.as_view(), name='paperinfo_list')
+    path('assignment/<int:assignment_id>/', PaperInfoListView.as_view(), name='paperinfo_list'),
+    path('assignment/<int:assignment_id>/<int:paper_id>/', PaperInfoDetailView.as_view(), name='paperinfo_detail'),
 ]

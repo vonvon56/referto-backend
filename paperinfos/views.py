@@ -76,7 +76,7 @@ Hassabis D, Kumaran D, Summerﬁeld C, Botvinick M. Neuroscience-Inspired Artifi
     return response.choices[0].message["content"].strip()
 
 class ProcessPaperInfo(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_id="PaperInfo 생성",
@@ -92,12 +92,17 @@ class ProcessPaperInfo(APIView):
         ]
     )
     def post(self, request, paper_id):
+        print("*****entered paperinfo post")
         paper = get_object_or_404(Paper, paper_id=paper_id)
         if not paper.pdf:
             return Response({"error": "PDF file not found."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        print("*****entered 2")
 
         pdf_path = paper.pdf.path
         pdf_text = extract_text_from_pdf(pdf_path, 1, 1)
+
+        print("*****entered 3")
 
         try:
             paper_info = extract_info_from_text(pdf_text)
@@ -115,6 +120,7 @@ class ProcessPaperInfo(APIView):
                 }
             )
             serializer = PaperInfoSerializer(paper_info_instance)
+            print("*****entered 4")
             
             if created:
                 message = "PaperInfo created successfully."
@@ -157,7 +163,7 @@ class ProcessPaperInfo(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     serializer_class = PaperInfoChangeSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_id="PaperInfo 수정",

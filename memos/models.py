@@ -3,7 +3,7 @@ from papers.models import Paper
 
 class Memo(models.Model):
     memo_id = models.AutoField(primary_key=True)  # 자동 증가 ID 필드
-    content = models.TextField()  # 메모 내용 필드
+    content = models.TextField(blank=True)  # 메모 내용 필드
     paper = models.OneToOneField(Paper, on_delete=models.CASCADE)  # 문서와의 관계 설정
 
     def __str__(self):

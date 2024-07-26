@@ -12,7 +12,7 @@ from .serializers import MemoSerializer
 
 class MemoDetailView(generics.GenericAPIView):
     serializer_class = MemoSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_id='Memo 로드',
@@ -40,8 +40,11 @@ class MemoDetailView(generics.GenericAPIView):
         
         memo = Memo.objects.filter(paper=paper).first()
 
+        #print("******entered")
+
         if memo is None:
             return Response({"detail": "Memo not found."}, status=404)
+        #print("******entered2")
         
         if paper.assignment.user != request.user:
             raise PermissionDenied("You do not have permission to view this memo.")
