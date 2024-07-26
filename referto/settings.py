@@ -35,8 +35,9 @@ SECRET_KEY =env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev','localhost']
+
 ALLOWED_HOSTS = ['referto-backend', '127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev', 'https://referto-backend.fly.dev','localhost']
+
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
@@ -89,6 +90,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
     'dj_rest_auth',
     'dj_rest_auth.registration',
     'drf_yasg',

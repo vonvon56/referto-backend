@@ -1,7 +1,8 @@
 from .views import *
 from .naverlogin_views import *
+
 from django.urls import path, include
-from rest_framework_simplejwt.views import TokenRefreshView
+#from rest_framework_simplejwt.views import TokenRefreshView
 
 urlpatterns = [
     path("register/", RegisterAPIView.as_view()), # post - 회원가입
