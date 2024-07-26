@@ -22,3 +22,14 @@ class UserAdmin(BaseUserAdmin):
     readonly_fields = ('created_at', 'updated_at')  # created_at과 updated_at을 readonly_fields에 추가
 
 admin.site.register(User, UserAdmin)
+
+
+# from django.contrib import admin
+# from allauth.socialaccount.models import SocialApp
+
+# class SocialAppAdmin(admin.ModelAdmin):
+#     list_display = ('name', 'provider', 'client_id', 'secret')
+#     list_filter = ('provider',)
+
+# admin.site.unregister(SocialApp)  # 기존 등록을 해제
+# admin.site.register(SocialApp, SocialAppAdmin)

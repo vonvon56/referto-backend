@@ -14,7 +14,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 # pdf 파일 업로드 뷰
 class PaperUploadView(generics.GenericAPIView):
     serializer_class = PaperCreateSerializer
-    permission_classes = [IsAuthenticated]
+    # # permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     @swagger_auto_schema(
         operation_id='Paper 생성',
@@ -40,7 +40,7 @@ class PaperUploadView(generics.GenericAPIView):
 
 
 class PaperDetailView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_id='Paper 삭제',
@@ -93,7 +93,7 @@ class PaperDetailView(generics.GenericAPIView):
             return None
         
 class PaperNumberView(generics.GenericAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_id='Paper 번호 로드',

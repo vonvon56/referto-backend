@@ -18,4 +18,7 @@ COPY . /code
 
 EXPOSE 8000
 
+RUN python manage.py collectstatic --noinput && \
+    python manage.py migrate
+
 CMD ["gunicorn", "--bind", ":8000", "--workers", "2", "referto.wsgi"]
