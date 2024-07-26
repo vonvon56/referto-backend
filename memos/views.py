@@ -40,11 +40,11 @@ class MemoDetailView(generics.GenericAPIView):
         
         memo = Memo.objects.filter(paper=paper).first()
 
-        print("******entered")
+        #print("******entered")
 
         if memo is None:
             return Response({"detail": "Memo not found."}, status=404)
-        print("******entered2")
+        #print("******entered2")
         
         if paper.assignment.user != request.user:
             raise PermissionDenied("You do not have permission to view this memo.")
