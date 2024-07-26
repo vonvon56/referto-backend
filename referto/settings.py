@@ -16,7 +16,7 @@ from datetime import timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env(
-    DEBUG=(bool, False)
+    DEBUG=(bool, True)
 )
 
 environ.Env.read_env(
@@ -35,12 +35,14 @@ SECRET_KEY =env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['referto-backend', '127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev','localhost']
+# ALLOWED_HOSTS = ['127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev','localhost']
+ALLOWED_HOSTS = ['referto-backend', '127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev', 'https://referto-backend.fly.dev','localhost']
 
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
     "http://localhost:3000",
-    # "https://referto.site",
+    'https://referto-backend.fly.dev',
+    "https://referto.site",
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = (
@@ -57,7 +59,15 @@ CSRF_TRUSTED_ORIGINS = [
    'http://localhost:3000',
    'https://referto-backend.fly.dev',
 ]
+CORS_ORIGIN_ALLOW_ALL = False 
+# SECURE_SSL_REDIRECT = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# Ensure that cookies are only sent via HTTPS
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:3000' ,'http://localhost:3000', 'https://referto-backend.fly.dev','http://referto-backend.fly.dev']
 INSTALLED_APPS = [
     'allauth',
     'allauth.account',
@@ -85,6 +95,9 @@ INSTALLED_APPS = [
     'corsheaders',
     'whitenoise.runserver_nostatic', 
 ]
+
+# SECURE_SSL_REDIRECT = True  # HTTP 요청을 HTTPS로 리다이렉트
+
 SITE_ID = 1
 AUTH_USER_MODEL = 'user.User'
 
@@ -95,21 +108,25 @@ ACCOUNT_EMAIL_REQUIRED = True            # email 필드 사용 o
 ACCOUNT_USERNAME_REQUIRED = False        # username 필드 사용 x
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
+REST_USE_JWT = True
+
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None # username 필드 사용 x
+ACCOUNT_EMAIL_REQUIRED = True            # email 필드 사용 o
+ACCOUNT_USERNAME_REQUIRED = False        # username 필드 사용 x
+ACCOUNT_AUTHENTICATION_METHOD = 'email'
 
 # jwt 토큰은 simplejwt의 JWTAuthentication으로 인증한다.
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
     ), 
-    'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated', # 인증된 사용자만 접근
+    # 'DEFAULT_PERMISSION_CLASSES': (
+        # 'rest_framework.permissions.IsAuthenticated', # 인증된 사용자만 접근
         # 'rest_framework.permissions.IsAdminUser', # 관리자만 접근
         # 'rest_framework.permissions.AllowAny', # 누구나 접근
     # )
         # 'rest_framework.permissions.AllowAny', # 누구나 접근
-    )
+    # )
 }
 
 MIDDLEWARE = [
@@ -131,6 +148,7 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
+
 
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
@@ -156,15 +174,32 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
+
     
 
 
 AUTHENTICATION_BACKENDS = (
-    'social_core.backends.google.GoogleOAuth2',
+    # 'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        },
+        'APP': {
+            'client_id': os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID"),
+            'secret': os.environ.get("SOCIAL_AUTH_GOOGLE_SECRET"),
+            'key': ''
+        }
+    }
+}
 
 ROOT_URLCONF = 'referto.urls'
 
@@ -183,6 +218,7 @@ TEMPLATES = [
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'referto.wsgi.application'
 

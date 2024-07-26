@@ -76,7 +76,7 @@ Hassabis D, Kumaran D, Summerﬁeld C, Botvinick M. Neuroscience-Inspired Artifi
     return response.choices[0].message["content"].strip()
 
 class ProcessPaperInfo(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_id="PaperInfo 생성",
@@ -157,7 +157,7 @@ class ProcessPaperInfo(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     serializer_class = PaperInfoChangeSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
         operation_id="PaperInfo 수정",
