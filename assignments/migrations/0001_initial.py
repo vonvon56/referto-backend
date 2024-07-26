@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             name='Assignment',
             fields=[
                 ('assignment_id', models.AutoField(primary_key=True, serialize=False)),
-                ('name', models.CharField(default='untitled', max_length=255)),
+                ('name', models.CharField(default='과제 이름', max_length=255)),
                 ('reference_type', models.CharField(choices=[('APA', 'APA'), ('Chicago', 'Chicago'), ('Vancouver', 'Vancouver'), ('MLA', 'MLA')], default='APA', max_length=10)),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
