@@ -37,6 +37,7 @@ SECRET_KEY =env('SECRET_KEY')
 DEBUG = True
 
 
+
 ALLOWED_HOSTS = ['referto-backend', '127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev', 'https://referto-backend.fly.dev','localhost', '*']
 
 
@@ -230,7 +231,6 @@ WSGI_APPLICATION = 'referto.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.sqlite3',
