@@ -239,7 +239,7 @@ WSGI_APPLICATION = 'referto.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql', # engine: mysql
-        'NAME' : 'referto-db', # DB Name
+        'NAME' : 'referto_db', # DB Name
         'USER' : 'admin', # DB User
         'PASSWORD' : 'refertodb', # Password
         'HOST': 'referto-db.cfsecok4g34k.ap-northeast-2.rds.amazonaws.com', # 생성한 데이터베이스 엔드포인트
