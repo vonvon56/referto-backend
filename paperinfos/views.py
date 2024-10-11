@@ -15,10 +15,10 @@ from .request_serializers import PaperInfoChangeSerializer
 # OpenAI API 키 설정
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-# 한국어 논문 여부 판별
-def contains_korean(text):
-    korean_pattern = re.compile(r'[가-힣]')
-    return bool(korean_pattern.search(text))
+# # 한국어 논문 여부 판별
+# def contains_korean(text):
+#     korean_pattern = re.compile(r'[가-힣]')
+#     return bool(korean_pattern.search(text))
 
 # PDF 파일의 특정 페이지 텍스트 추출 함수
 def extract_text_from_pdf(pdf_path, start_page, end_page):
@@ -30,115 +30,61 @@ def extract_text_from_pdf(pdf_path, start_page, end_page):
     return text
 
 # GPT API에 텍스트 전달하여 정보 추출 함수
-def extract_info_from_korean_text(pdf_text):
-    prompt = f"""제공된 PDF OCR 결과를 바탕으로 MLA, APA, Chicago, Vancouver 형식으로 인용을 작성하십시오:
+def extract_info_from_text(pdf_text):
+    prompt = f"""This is the text of a paper that you will generate citations for: {pdf_text}
+You are provided with a paper's details, citation guidelines, and styles (APA, MLA, Chicago, Vancouver). Based on this information, generate citations for each style, keeping the author names and journal title exactly as they appear in the original language. Use the following output format in JSON:
 
-1. 제공된 PDF OCR 결과가 학술 논문에서 추출되었고 인용에 필요한 모든 정보를 포함하는지 확인하십시오:
-3. 추출된 정보를 사용하여 인용을 **MLA, APA, Chicago, Vancouver** 형식으로 작성하십시오.
-4. 최종 인용 형식의 정확성과 일관성을 확인하십시오.
-5. 인용 형식이 정확하게 한글로 출력되었는지 확인하십시오.
+Paper Details:
 
-인용 내용을 추가 설명 없이 직접 출력하십시오.
+Title: 일본어에서 간접차용된 영어 차용어의 음운론적 특질
+Authors: 이경철, 김대영
+Journal: 환경연구
+Volume: 10
+Issue: 2
+Pages: 195-202
+Year: 2023
+Citation Guidelines Recap:
 
-### 예시 인용:
-MLA:
-김경애. "회빙환과 시간 되감기 서사의 문화적 의미 -웹소설 『내 남편과 결혼해 줘』를 중심으로-." 한국산학기술학회 논문지, vol. 25, no. 1, 2024, 734-743.
-APA:
-김경애. (2024). 회빙환과 시간 되감기 서사의 문화적 의미 -웹소설 『내 남편과 결혼해 줘』를 중심으로-. 한국산학기술학회 논문지, 25(1), 734-743, 10.5762/KAIS.2024.25.1.734
-Chicago:
-김경애. "회빙환과 시간 되감기 서사의 문화적 의미 -웹소설 『내 남편과 결혼해 줘』를 중심으로-." 한국산학기술학회 논문지 25, no. 1 (2024): 734-743, 10.5762/KAIS.2024.25.1.734
-Vancouver:
-김경애. 회빙환과 시간 되감기 서사의 문화적 의미 -웹소설 『내 남편과 결혼해 줘』를 중심으로-. 한국산학기술학회 논문지. 2024;25(1): 734-743. 10.5762/KAIS.2024.25.1.734
+APA Style: Focuses on the date and uses initials for authors but does not include "&" for non-English names.
+MLA Style: Focuses on the author names, using full names.
+Chicago Style: Uses full author names and supports "Notes-Bibliography" format.
+Vancouver Style: Uses numbered references listed in the order they appear and uses initials for authors.
+Do not use \, *, or similar special characters in the citations.
+Generate the citations in the following JSON format:
 
-### 처리할 PDF OCR 결과:
-{pdf_text}
-
-인용을 반드시 다음과 같은 형식으로 출력하십시오:
-
-
-MLA:
-김경애. "회빙환과 시간 되감기 서사의 문화적 의미 -웹소설 『내 남편과 결혼해 줘』를 중심으로-." 한국산학기술학회 논문지, vol. 25, no. 1, 2024, 734-743.
-APA:
-김경애. (2024). 회빙환과 시간 되감기 서사의 문화적 의미 -웹소설 『내 남편과 결혼해 줘』를 중심으로-. 한국산학기술학회 논문지, 25(1), 734-743, 10.5762/KAIS.2024.25.1.734
-Chicago:
-김경애. "회빙환과 시간 되감기 서사의 문화적 의미 -웹소설 『내 남편과 결혼해 줘』를 중심으로-." 한국산학기술학회 논문지 25, no. 1 (2024): 734-743, 10.5762/KAIS.2024.25.1.734
-Vancouver:
-김경애. 회빙환과 시간 되감기 서사의 문화적 의미 -웹소설 『내 남편과 결혼해 줘』를 중심으로-. 한국산학기술학회 논문지. 2024;25(1): 734-743. 10.5762/KAIS.2024.25.1.734
-
+example:
+{{
+  "apa": "이경철, 김대영. (2023). 일본어에서 간접차용된 영어 차용어의 음운론적 특질. 환경연구, 10(2), 195-202.",
+  "mla": "이경철, 김대영. 일본어에서 간접차용된 영어 차용어의 음운론적 특질. 환경연구, vol. 10, no. 2, 2023, pp. 195-202.",
+  "chicago": "이경철, 김대영. 일본어에서 간접차용된 영어 차용어의 음운론적 특질. 환경연구 10, no. 2 (2023): 195-202.",
+  "vancouver": "이경철, 김대영. 일본어에서 간접차용된 영어 차용어의 음운론적 특질. 환경연구. 2023;10(2):195-202."
+}}
+Ensure that the author names, journal title, and paper title remain exactly as they appear in the provided details, in the original language, and do not use "&" between the author names.
 """
-
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=600
-    )
-
-    return response.choices[0].message["content"].strip()
-
-
-def extract_info_from_english_text(pdf_text):
-    prompt = f"""Given the PDF OCR results provided, follow the steps to create citations in MLA, APA, Chicago, and Vancouver formats:
-
-1. Confirm if the provided PDF OCR results are from an academic paper and contain all necessary information for citation:
-    - Title of the paper
-    - Authors
-    - Journal name
-    - Year of publication
-    - Volume and issue number (if available)
-    - Page numbers
-    If the results are not from an academic paper or do not contain all necessary information, respond that the information cannot be found.
-2. Extract the necessary information for citation:
-    - Title of the paper
-    - Authors
-    - Journal name
-    - Year of publication
-    - Volume and issue number (if available)
-    - Page numbers
-3. Using the extracted information, format the citation **only** in the following styles: MLA, APA, Chicago, and Vancouver.
-4. Ensure the final citation formats are correct and consistent.
-
-Output the formatted citations directly without any additional explanation.
-
-### Example citations:
-MLA:
-Hassabis, Demis, et al. "Neuroscience-Inspired Artificial Intelligence." Neuron, vol. 95, 2017, pp. 245-268.
-APA:
-Hassabis, Demis, et al. (2017). Neuroscience-Inspired Artificial Intelligence. Neuron, 95, 245-268.
-Chicago:
-Hassabis, D., Kumaran, D., Summerﬁeld, C., & Botvinick, M. "Neuroscience-Inspired Artificial Intelligence." Neuron. 2017;95:245-268.
-Vancouver:
-Hassabis D, Kumaran D, Summerﬁeld C, Botvinick M. Neuroscience-Inspired Artificial Intelligence. Neuron. 2017;95:245-268.
-
-### PDF OCR results to process:
-{pdf_text}
-
-Output the citations in the following format:
-
-
-MLA:
-Hassabis, Demis, et al. "Neuroscience-Inspired Artificial Intelligence." Neuron, vol. 95, 2017, pp. 245-268.
-APA:
-Hassabis, Demis, et al. (2017). Neuroscience-Inspired Artificial Intelligence. Neuron, 95, 245-268.
-Chicago:
-Hassabis, D., Kumaran, D., Summerﬁeld, C., & Botvinick, M. "Neuroscience-Inspired Artificial Intelligence." Neuron. 2017;95:245-268.
-Vancouver:
-Hassabis D, Kumaran D, Summerﬁeld C, Botvinick M. Neuroscience-Inspired Artificial Intelligence. Neuron. 2017;95:245-268.
-
-"""
-
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo",
-        messages=[
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=600
-    )
-
-    return response.choices[0].message["content"].strip()
+    
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=3000
+        )
+        print("response: ", response)
+        print("refined: ", response.choices[0].message["content"].strip())
+        json_match = re.search(r"\{[\s\S]*\}", response.choices[0].message["content"].strip())
+        if json_match:
+            print('json_match: ', json_match.group())
+            return json_match.group()
+        else:
+            return response.choices[0].message["content"].strip()
+    except openai.error.OpenAIError as e:
+        print(f"OpenAI API 오류: {e}")  
+        return None  # 또는 적절한 오류 응답
+    except Exception as e:
+        print(f"예상치 못한 오류: {e}")
+        return None  # 또는 적절한 오류 응답
 
 
 class ProcessPaperInfo(APIView):
@@ -171,22 +117,17 @@ class ProcessPaperInfo(APIView):
         print("*****entered 3")
 
         try:
-            # 한국어 논문인 경우
-            if contains_korean(pdf_text):
-                paper_info = extract_info_from_korean_text(pdf_text)
-            else:
-                paper_info = extract_info_from_english_text(pdf_text)
-            paper_info_list = re.split(r'\n+', paper_info)
-            print(paper_info_list)
+            paper_info_text = extract_info_from_text(pdf_text)      
+            paper_info = json.loads(paper_info_text)
             
             # 기존의 PaperInfo 객체가 있으면 가져오고, 없으면 생성
             paper_info_instance, created = PaperInfo.objects.update_or_create(
                 paper=paper,
                 defaults={
-                    'MLA': paper_info_list[1],
-                    'APA': paper_info_list[3],
-                    'Chicago': paper_info_list[5],
-                    'Vancouver': paper_info_list[7]
+                    'MLA': re.sub(r'[\\*]', '', paper_info.get('mla', '')),
+                    'APA': re.sub(r'[\\*]', '', paper_info.get('apa', '')),
+                    'Chicago': re.sub(r'[\\*]', '', paper_info.get('chicago', '')),
+                    'Vancouver': re.sub(r'[\\*]', '', paper_info.get('vancouver', ''))
                 }
             )
             serializer = PaperInfoSerializer(paper_info_instance)
@@ -199,12 +140,10 @@ class ProcessPaperInfo(APIView):
             
             return Response({"message": message, "paper_info": serializer.data}, status=status.HTTP_200_OK)
         
-        except RateLimitError:
-            return Response({"error": "Rate limit exceeded. Please try again later."}, status=status.HTTP_429_TOO_MANY_REQUESTS)
-        except InvalidRequestError:
-            return Response({"error": "Error parsing the response from OpenAI."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except json.JSONDecodeError:
             return Response({"error": "Error parsing the response from OpenAI."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        except KeyError as e:
+            return Response({"error": f"Missing key in paper_info: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
