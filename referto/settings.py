@@ -25,7 +25,8 @@ environ.Env.read_env(
 ### 여기까지 추가
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-
+import pymysql
+pymysql.install_as_MySQLdb()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -36,7 +37,7 @@ SECRET_KEY =env('SECRET_KEY')
 DEBUG = True
 
 
-ALLOWED_HOSTS = ['referto-backend', '127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev', 'https://referto-backend.fly.dev','localhost']
+ALLOWED_HOSTS = ['referto-backend', '127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev', 'https://referto-backend.fly.dev','localhost', '*']
 
 
 CORS_ALLOWED_ORIGINS = [
@@ -44,6 +45,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     'https://referto-backend.fly.dev',
     "https://referto.site",
+    'http://43.201.56.176:8000',
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = (
@@ -59,6 +61,7 @@ CSRF_TRUSTED_ORIGINS = [
    'http://127.0.0.1:3000', 
    'http://localhost:3000',
    'https://referto-backend.fly.dev',
+   'http://43.201.56.176:8000',
 ]
 CORS_ORIGIN_ALLOW_ALL = False 
 # SECURE_SSL_REDIRECT = True
@@ -68,7 +71,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-CORS_ORIGIN_WHITELIST = ['http://127.0.0.1:3000' ,'http://localhost:3000', 'https://referto-backend.fly.dev','http://referto-backend.fly.dev']
+CORS_ORIGIN_WHITELIST = ['http://43.201.56.176:8000', 'http://127.0.0.1:3000' ,'http://localhost:3000', 'https://referto-backend.fly.dev','http://referto-backend.fly.dev']
 INSTALLED_APPS = [
     'allauth',
     'allauth.account',
@@ -228,13 +231,26 @@ WSGI_APPLICATION = 'referto.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql', # engine: mysql
+        'NAME' : 'referto_db', # DB Name
+        'USER' : 'admin', # DB User
+        'PASSWORD' : 'refertodb', # Password
+        'HOST': 'referto-db.cfsecok4g34k.ap-northeast-2.rds.amazonaws.com', # 생성한 데이터베이스 엔드포인트
+        'PORT': '3306', # 데이터베이스 포트
+        'OPTIONS':{
+            'init_command' : "SET sql_mode='STRICT_TRANS_TABLES'"
+        }
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
