@@ -8,7 +8,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .models import Paper, PaperInfo
 from assignments.models import Assignment
-from openai.error import OpenAIError, RateLimitError, InvalidRequestError  # 여기서 예외 클래스 가져오기
+#from openai.error import OpenAIError, RateLimitError, InvalidRequestError  # 여기서 예외 클래스 가져오기
 from rest_framework.permissions import IsAuthenticated
 from .serializers import PaperInfoSerializer
 from .request_serializers import PaperInfoChangeSerializer

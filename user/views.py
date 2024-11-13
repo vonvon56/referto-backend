@@ -12,6 +12,7 @@ from drf_yasg.utils import swagger_auto_schema
 from drf_yasg import openapi
 from .request_serializers import *
 from .serializers import *
+from django.views.decorators.csrf import csrf_exempt
 
 # 회원가입
 class RegisterAPIView(APIView):
@@ -167,6 +168,7 @@ from allauth.socialaccount.models import SocialAccount
 state = os.environ.get("STATE")
 BASE_URL = 'http://127.0.0.1:8000/'
 GOOGLE_CALLBACK_URI = BASE_URL + 'api/user/google/callback/'
+GOOGLE_CALLBACK_URI = "http://127.0.0.1:8000/api/user/google/callback/"
 # 구글 로그인
 def google_login(request):
     scope = "https://www.googleapis.com/auth/userinfo.email"
@@ -175,87 +177,144 @@ def google_login(request):
     return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}")
 
 
+import json
+import os
+import requests
+from django.http import JsonResponse
+from requests.exceptions import JSONDecodeError
+from django.http import JsonResponse
+from rest_framework import status
+from django.core.exceptions import ObjectDoesNotExist
+
+@csrf_exempt
 def google_callback(request):
     client_id = os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
     client_secret = os.environ.get("SOCIAL_AUTH_GOOGLE_SECRET")
     code = request.GET.get('code')
-    # state = request.GET.get('state')
+    state = request.GET.get('state')
     print("code: ", code)
     print("state: ", state)
-    # 1. 받은 코드로 구글에 access token 요청
-    token_req = requests.post(f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={state}")
-  
-    ### 1-1. json으로 변환 & 에러 부분 파싱
-    token_req_json = token_req.json()
-    error = token_req_json.get("error")
-    ### 1-2. 에러 발생 시 종료
-    if error is not None:
-        raise JSONDecodeError(error)
 
-    ### 1-3. 성공 시 access_token 가져오기
+    # 1. 받은 코드로 구글에 access token 요청
+    token_req = requests.post(
+        f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={state}"
+    )
+    print('token_req:', token_req)
+    # JSON 변환 시도 및 오류 처리
+    try:
+        token_req_json = token_req.json()
+        print('token_req_json: ', token_req_json)
+        error = token_req_json.get("error")
+        if error is not None:
+            return JsonResponse({"error": error}, status=400)
+    except JSONDecodeError as e:
+        # JSON 파싱 실패 시 에러 메시지 반환
+        return JsonResponse({"error": "Failed to parse JSON from token response", "details": str(e)}, status=400)
+
+    # 1-3. 성공 시 access_token 가져오기
     access_token = token_req_json.get('access_token')
-    #################################################################
 
     # 2. 가져온 access_token으로 이메일값을 구글에 요청
     email_req = requests.get(f"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={access_token}")
     email_req_status = email_req.status_code
 
-    ### 2-1. 에러 발생 시 400 에러 반환
+    # 2-1. 에러 발생 시 400 에러 반환
     if email_req_status != 200:
-        return JsonResponse({'err_msg': 'failed to get email'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    ### 2-2. 성공 시 이메일 가져오기
-    email_req_json = email_req.json()
-    email = email_req_json.get('email')
-    print('email: ', email)
-    # return JsonResponse({'access': access_token, 'email':email})
+        return JsonResponse({'err_msg': 'failed to get email'}, status=400)
 
-    #################################################################
+    # 이메일 요청 JSON 변환 시도 및 오류 처리
+    try:
+        email_req_json = email_req.json()
+        email = email_req_json.get('email')
+        print('email: ', email)
+        print('')
+    except JSONDecodeError as e:
+        return JsonResponse({"error": "Failed to parse JSON from email response", "details": str(e)}, status=400)
 
     # 3. 전달받은 이메일, access_token, code를 바탕으로 회원가입/로그인
+
     try:
-        # 전달받은 이메일로 등록된 유저가 있는지 탐색
+        # 전달받은 이메일로 등록된 유저가 있는지 탐색, 없다면 Exception 발생
         user = User.objects.get(email=email)
+        token = RefreshToken.for_user(user)  # 자체 jwt 발급
+        refresh_token = str(token)
+        access_token = str(token.access_token)
 
-        # FK로 연결되어 있는 socialaccount 테이블에서 해당 이메일의 유저가 있는지 확인
-        social_user = SocialAccount.objects.get(user=user)
+        # 유저가 활성화된 경우
+        if user.is_active:
+            return JsonResponse({'access_token': access_token, 'refresh_token': refresh_token}, status=status.HTTP_200_OK)
+        else:
+            # 활성화되지 않은 회원, Exception 발생
+            raise Exception('Signup Required')
 
-        # 있는데 구글계정이 아니어도 에러
-        if social_user.provider != 'google':
-            return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
+    except ObjectDoesNotExist:
+        # 유저가 존재하지 않는 경우 - 회원가입 프로세스 호출
+        data = {'email': email, 'username': email.split('@')[0], 'password': 'auto_generated_password'}  # 간단한 초기 데이터
+        print('signupdata: ', data)
+        serializer = UserSerializer(data=data)
+        
+        if serializer.is_valid():
+            user = serializer.save()
+            token = RefreshToken.for_user(user)
+            refresh_token = str(token)
+            access_token = str(token.access_token)
+            
+            # 응답 반환
+            return JsonResponse({
+                'user': serializer.data,
+                'message': 'User registered successfully',
+                'token': {
+                    'access_token': access_token,
+                    'refresh_token': refresh_token,
+                }
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        # 이미 Google로 제대로 가입된 유저 => 로그인 & 해당 우저의 jwt 발급
-        data = {'access_token': access_token, 'code': code}
-        accept = requests.post(f"{BASE_URL}api/user/google/login/finish/", data=data)
-        accept_status = accept.status_code
+    except Exception as e:
+        # 활성화되지 않은 유저 혹은 다른 에러를 처리
+        try:
+            # FK로 연결된 socialaccount 테이블에서 해당 이메일의 유저 확인
+            social_user = SocialAccount.objects.get(user=user)
+            
+            # Google 계정이 아닌 경우 에러 반환
+            if social_user.provider != 'google':
+                return JsonResponse({'err_msg': 'no matching social type'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Google 로그인으로 연결
+            data = {'access_token': access_token, 'code': code}
+            accept = requests.post(f"{BASE_URL}api/user/google/login/finish/", data=data)
+            
+            # 최종 응답 반환
+            return JsonResponse({'msg': 'Login successful'}, status=accept.status_code)
+        
+        except ObjectDoesNotExist:
+            # 유저가 존재하지 않는 경우 - 회원가입 프로세스 호출
+            data = {'email': email, 'username': email.split('@')[0], 'password': 'auto_generated_password'}  # 간단한 초기 데이터
+            serializer = UserSerializer(data=data)
+            
+            if serializer.is_valid():
+                user = serializer.save()
+                token = RefreshToken.for_user(user)
+                refresh_token = str(token)
+                access_token = str(token.access_token)
+                
+                # 응답 반환
+                return JsonResponse({
+                    'user': serializer.data,
+                    'message': 'User registered successfully',
+                    'token': {
+                        'access_token': access_token,
+                        'refresh_token': refresh_token,
+                    }
+                }, status=status.HTTP_201_CREATED)
+            else:
+                return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                
+        except Exception as e:
+            # 기타 예외 처리
+            return JsonResponse({'err_msg': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # 뭔가 중간에 문제가 생기면 에러
-        if accept_status != 200:
-            return JsonResponse({'err_msg': 'failed to signin'}, status=accept_status)
-
-        accept_json = accept.json()
-        accept_json.pop('user', None)
-        return JsonResponse(accept_json)
-
-    except User.DoesNotExist:
-        # 전달받은 이메일로 기존에 가입된 유저가 아예 없으면 => 새로 회원가입 & 해당 유저의 jwt 발급
-        data = {'access_token': access_token, 'code': code}
-
-        accept = requests.post("http://127.0.0.1:8000/api/user/google/login/finish/", data=data)
-        accept_status = accept.status_code
-        print('data: ', json.dumps(data))
-        print(accept_status)
-        # 뭔가 중간에 문제가 생기면 에러
-        if accept_status != 200:
-            return JsonResponse({'err_msg': 'failed to signup'}, status=accept_status)
-
-        accept_json = accept.json()
-        accept_json.pop('user', None)
-        return JsonResponse(accept_json)
-    
-    except SocialAccount.DoesNotExist:
-    	# User는 있는데 SocialAccount가 없을 때 (=일반회원으로 가입된 이메일일때)
-      return JsonResponse({'err_msg': 'email exists but not social user'}, status=status.HTTP_400_BAD_REQUEST)
 
 from dj_rest_auth.registration.views import SocialLoginView
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
