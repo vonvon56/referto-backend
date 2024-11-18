@@ -12,6 +12,7 @@ from assignments.models import Assignment
 from rest_framework.permissions import IsAuthenticated
 from .serializers import PaperInfoSerializer
 from .request_serializers import PaperInfoChangeSerializer
+
 # OpenAI API 키 설정
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 

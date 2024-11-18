@@ -24,3 +24,4 @@ class Paper(models.Model):
         for index, paper in enumerate(papers):
             paper.number = index + 1
             paper.save(update_fields=['number'])
+

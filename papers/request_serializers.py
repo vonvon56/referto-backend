@@ -5,3 +5,6 @@ from .models import Paper
 class PaperCreateSerializer(serializers.Serializer):
     pdf = serializers.FileField()
     assignment = serializers.IntegerField()
+
+class LandingPagePaperCreateSerializer(serializers.Serializer):
+    pdf = serializers.FileField()
