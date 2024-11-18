@@ -50,5 +50,5 @@ urlpatterns = [
     # memos
     path('api/papers/', include('memos.urls')),
     # notes
-    path('api/notes', include('notes.urls')),
+    path('api/notes/', include('notes.urls')),
 ]

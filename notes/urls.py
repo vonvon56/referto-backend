@@ -20,5 +20,5 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-  path('<int:paper_id>/', NoteListView.as_view(), name='note_list'), 
+  path('<int:paperId>/', NoteListView.as_view(), name='note_list'), 
 ]

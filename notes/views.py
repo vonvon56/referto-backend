@@ -25,9 +25,9 @@ class NoteListView(generics.GenericAPIView):
     },
   )
 
-  def get(self, request, paper_id):
+  def get(self, request, paperId):
     try:
-      paper = Paper.objects.get(paper_id=paper_id)
+      paper = Paper.objects.get(paper_id=paperId)
     except Paper.DoesNotExist:
       return Response({"detail": "Paper not found."}, status=status.HTTP_404_NOT_FOUND)
     
@@ -48,8 +48,8 @@ class NoteListView(generics.GenericAPIView):
       400: "Bad Request",
     },
   )
-  def post(self, request, paper_id):
-    paper = get_object_or_404(Paper, paper_id=paper_id)
+  def post(self, request, paperId):
+    paper = get_object_or_404(Paper, paper_id=paperId)
     if not paper.pdf:
       return Response({"error": "PDF file not found."}, status=status.HTTP_404_NOT_FOUND)
     
