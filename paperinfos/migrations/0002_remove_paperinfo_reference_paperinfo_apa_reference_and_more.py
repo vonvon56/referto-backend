@@ -10,10 +10,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='paperinfo',
-            name='reference',
-        ),
+        # migrations.RemoveField(
+        #     model_name='paperinfo',
+        #     name='reference',
+        # ),
         migrations.AddField(
             model_name='paperinfo',
             name='apa_reference',

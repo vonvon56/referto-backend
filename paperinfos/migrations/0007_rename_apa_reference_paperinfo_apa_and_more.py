@@ -10,24 +10,24 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameField(
-            model_name='paperinfo',
-            old_name='apa_reference',
-            new_name='APA',
-        ),
-        migrations.RenameField(
-            model_name='paperinfo',
-            old_name='chicago_reference',
-            new_name='Chicago',
-        ),
-        migrations.RenameField(
-            model_name='paperinfo',
-            old_name='mla_reference',
-            new_name='MLA',
-        ),
-        migrations.RenameField(
-            model_name='paperinfo',
-            old_name='vancouver_reference',
-            new_name='Vancouver',
-        ),
+        # migrations.RenameField(
+        #     model_name='paperinfo',
+        #     old_name='apa_reference',
+        #     new_name='APA',
+        # ),
+        # migrations.RenameField(
+        #     model_name='paperinfo',
+        #     old_name='chicago_reference',
+        #     new_name='Chicago',
+        # ),
+        # migrations.RenameField(
+        #     model_name='paperinfo',
+        #     old_name='mla_reference',
+        #     new_name='MLA',
+        # ),
+        # migrations.RenameField(
+        #     model_name='paperinfo',
+        #     old_name='vancouver_reference',
+        #     new_name='Vancouver',
+        # ),
     ]
