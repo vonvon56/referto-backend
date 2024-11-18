@@ -64,3 +64,20 @@ class NoteListView(generics.GenericAPIView):
     serializer = NoteSerializer(note)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+class NoteDetailView(generics.GenericAPIView):
+  serializer_class = NoteSerializer
+  @swagger_auto_schema(
+    operation_id='note 삭제',
+    operation_description='특정 note를 삭제합니다.',
+    responses={
+      204: 'No Content',
+      404: 'Not Found'
+    },
+  )
+  def delete(self, request, noteId):
+    try:
+      note = Note.objects.get(note_id=noteId)
+    except:
+      return Response({"detail":"Paper not found."}, status=status.HTTP_404_NOT_FOUND)
+    note.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
