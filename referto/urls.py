@@ -20,6 +20,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from user.views import *
+
 schema_view = get_schema_view(
     openapi.Info(
         title="Referto API",
@@ -48,4 +49,6 @@ urlpatterns = [
     path('api/paperinfo/', include('paperinfos.urls')),
     # memos
     path('api/papers/', include('memos.urls')),
+    # notes
+    path('api/notes', include('notes.urls')),
 ]
