@@ -170,7 +170,7 @@ state = os.environ.get("STATE")
 # BASE_URL = 'http://127.0.0.1:8000/'
 # 실제 서버의 base url
 BASE_URL = 'https://www.referto.site/'
-GOOGLE_CALLBACK_URI = BASE_URL + 'api/user/google/callback/'
+GOOGLE_CALLBACK_URI = 'https://www.referto.site/api/user/google/callback/'
 # GOOGLE_CALLBACK_URI = "http://127.0.0.1:8000/api/user/google/callback/"
 # 구글 로그인
 def google_login(request):
