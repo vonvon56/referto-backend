@@ -113,7 +113,7 @@ class ProcessPaperInfo(APIView):
         print("*****entered 2")
 
         pdf_path = paper.pdf.path
-        pdf_text = extract_text_from_pdf(pdf_path, 1, 1)
+        pdf_text = extract_text_from_pdf(pdf_path, 1, 2)
 
         print("*****entered 3")
 
