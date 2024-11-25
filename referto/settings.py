@@ -19,10 +19,18 @@ env = environ.Env(
     DEBUG=(bool, True)
 )
 
+
 environ.Env.read_env(
     env_file=os.path.join(BASE_DIR, '.env')
 )
-### 여기까지 추가
+# Kakao API configuration
+KAKAO_REST_API_KEY = os.environ.get("KAKAO_SECRET_KEY")
+KAKAO_REDIRECT_URI = os.environ.get("KAKAO_REDIRECT_URI")
+
+# Kakao API URLs (fixed and public information)
+KAKAO_AUTH_URL = "https://kauth.kakao.com/oauth/authorize"
+KAKAO_TOKEN_URL = "https://kauth.kakao.com/oauth/token"
+KAKAO_USER_INFO_URL = "https://kapi.kakao.com/v2/user/me"
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 import pymysql
@@ -169,7 +177,8 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID"),
             'secret': os.environ.get("SOCIAL_AUTH_GOOGLE_SECRET"),
             'key': ''
-        }
+        },
+        'METHOD': 'oauth2',
     }, 
     'naver': {
         'APP': {
@@ -230,6 +239,13 @@ WSGI_APPLICATION = 'referto.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 # DATABASES = {
 #     'default': {
