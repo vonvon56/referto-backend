@@ -1,6 +1,7 @@
 from .views import *
+from .kakaologin_views import *
 from .naverlogin_views import *
-
+from .googlelogin_views import *
 from django.urls import path, include
 #from rest_framework_simplejwt.views import TokenRefreshView
 
@@ -18,4 +19,7 @@ urlpatterns = [
     path('naver/login/', naver_login, name='google_login'),
     path('naver/callback/', naver_callback, name='google_callback'),
     path('naver/login/finish/', NaverLogin.as_view(), name='google_login_todjango'),
+
+    path('kakao/login/', kakao_login, name='kakao_login'),
+    path('kakao/callback/', kakao_callback, name='kakao_callback'),
 ]
