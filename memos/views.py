@@ -17,7 +17,7 @@ class MemoDetailView(generics.GenericAPIView):
     @swagger_auto_schema(
         operation_id='Memo 로드',
         operation_description="해당 메모를 가져옵니다.",
-        responses={200: MemoSerializer()},
+        responses={200: MemoSerializer(), 404: "Not Found",},
         manual_parameters=[
             openapi.Parameter(
                 "Authorization", 
