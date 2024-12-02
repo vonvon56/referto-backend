@@ -20,7 +20,7 @@ from rest_framework import permissions
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from user.views import *
-
+from user.kakaologin_views import *
 schema_view = get_schema_view(
     openapi.Info(
         title="Referto API",
@@ -39,7 +39,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     # user
-    path('api/user/', include('allauth.urls')),
+    #path('api/user/', include('allauth.urls')),
     path('api/user/', include('user.urls')),
     # assignments
     path('api/assignments/', include('assignments.urls')),
@@ -51,4 +51,5 @@ urlpatterns = [
     path('api/papers/', include('memos.urls')),
     # notes
     path('api/notes/', include('notes.urls')),
+    path('auth', kakao_callback, name='kakao_callback'),
 ]
