@@ -16,10 +16,11 @@ urlpatterns = [
     path('google/login/finish/', GoogleLogin.as_view(), name='google_login_todjango'),
 
      # 네이버 소셜로그인
-    path('naver/login/', naver_login, name='google_login'),
-    path('naver/callback/', naver_callback, name='google_callback'),
-    path('naver/login/finish/', NaverLogin.as_view(), name='google_login_todjango'),
+    # path('naver/login/', naver_login, name='naver_login'),
+    # path('naver/callback/', naver_callback, name='naver_callback'),
+    # path('naver/login/finish/', NaverLogin.as_view(), name='naver_login_todjango'),
 
-    path('kakao/login/', kakao_login, name='kakao_login'),
-    path('kakao/callback/', kakao_callback, name='kakao_callback'),
+    # 카카오 소셜로그인
+    # path('kakao/login/', kakao_login, name='kakao_login'),
+    # path('kakao/callback/', kakao_callback, name='kakao_callback'),
 ]

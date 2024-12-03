@@ -15,16 +15,15 @@ from .views import *
 # 구글 소셜로그인 변수 설정
 state = os.environ.get("STATE")
 
-# BASE_URL = 'http://127.0.0.1:8000/'
-BASE_URL = 'https://www.referto.site/'
+# 환경 변수나 설정에 따라 BASE_URL 결정
+IS_PRODUCTION = os.environ.get('DJANGO_ENV') == 'production'
+BASE_URL = 'http://ec2-43-201-56-176.ap-northeast-2.compute.amazonaws.com/' if IS_PRODUCTION else 'http://127.0.0.1:8000/'
+GOOGLE_CALLBACK_URI = f"{BASE_URL}api/user/google/callback/"
 
-# GOOGLE_CALLBACK_URI = "http://127.0.0.1:8000/api/user/google/callback/"
-GOOGLE_CALLBACK_URI = 'https://www.referto.site/api/user/google/callback/'
 # 구글 로그인
 def google_login(request):
     scope = "https://www.googleapis.com/auth/userinfo.email"
     client_id = os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
-    print(client_id)
     return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}")
 
 
@@ -36,30 +35,29 @@ from requests.exceptions import JSONDecodeError
 from django.http import JsonResponse
 from rest_framework import status
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponseRedirect
 
 @csrf_exempt
-def google_callback(request):
+def google_callback(request):    
     client_id = os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
     client_secret = os.environ.get("SOCIAL_AUTH_GOOGLE_SECRET")
     code = request.GET.get('code')
     state = request.GET.get('state')
-    print("code: ", code)
-    print("state: ", state)
+    
+    if not code:
+        return JsonResponse({"error": "No code provided"}, status=400)
 
-    # 1. 받은 코드로 구글에 access token 요청
+    # 1. Token Request
     token_req = requests.post(
         f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={state}"
     )
-    print('token_req:', token_req)
-    # JSON 변환 시도 및 오류 처리
+    
     try:
         token_req_json = token_req.json()
-        print('token_req_json: ', token_req_json)
         error = token_req_json.get("error")
         if error is not None:
             return JsonResponse({"error": error}, status=400)
     except JSONDecodeError as e:
-        # JSON 파싱 실패 시 에러 메시지 반환
         return JsonResponse({"error": "Failed to parse JSON from token response", "details": str(e)}, status=400)
 
     # 1-3. 성공 시 access_token 가져오기
@@ -69,16 +67,12 @@ def google_callback(request):
     email_req = requests.get(f"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={access_token}")
     email_req_status = email_req.status_code
 
-    # 2-1. 에러 발생 시 400 에러 반환
     if email_req_status != 200:
         return JsonResponse({'err_msg': 'failed to get email'}, status=400)
 
-    # 이메일 요청 JSON 변환 시도 및 오류 처리
     try:
         email_req_json = email_req.json()
         email = email_req_json.get('email')
-        print('email: ', email)
-        print('')
     except JSONDecodeError as e:
         return JsonResponse({"error": "Failed to parse JSON from email response", "details": str(e)}, status=400)
 
@@ -93,7 +87,10 @@ def google_callback(request):
 
         # 유저가 활성화된 경우
         if user.is_active:
-            return JsonResponse({'access_token': access_token, 'refresh_token': refresh_token}, status=status.HTTP_200_OK)
+            # 프론트엔드 URL 설정
+            frontend_url = 'http://localhost:3000' if not IS_PRODUCTION else 'https://www.referto.site'
+            redirect_url = f"{frontend_url}/google/callback?access_token={access_token}&refresh_token={refresh_token}"
+            return HttpResponseRedirect(redirect_url)
         else:
             # 활성화되지 않은 회원, Exception 발생
             raise Exception('Signup Required')
@@ -101,7 +98,6 @@ def google_callback(request):
     except ObjectDoesNotExist:
         # 유저가 존재하지 않는 경우 - 회원가입 프로세스 호출
         data = {'email': email, 'username': email.split('@')[0], 'password': 'auto_generated_password'}  # 간단한 초기 데이터
-        print('signupdata: ', data)
         serializer = UserSerializer(data=data)
         
         if serializer.is_valid():
@@ -180,5 +176,5 @@ from django.http import JsonResponse
     
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = 'http://127.0.0.1:8000/api/user/google/callback/'
+    callback_url = 'http://ec2-43-201-56-176.ap-northeast-2.compute.amazonaws.com/api/user/google/callback/'
     client_class = OAuth2Client
