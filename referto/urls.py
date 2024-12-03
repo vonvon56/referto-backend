@@ -49,5 +49,7 @@ urlpatterns = [
     path('api/paperinfo/', include('paperinfos.urls')),
     # memos
     path('api/papers/', include('memos.urls')),
+    # notes
+    path('api/notes/', include('notes.urls')),
     path('auth', kakao_callback, name='kakao_callback'),
 ]

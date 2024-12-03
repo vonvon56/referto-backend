@@ -20,5 +20,5 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('<int:pk>/memo/', MemoDetailView.as_view(), name='process_paper_info'), 
+    path('<int:pk>/memo/', MemoDetailView.as_view(), name='memo_list'), 
 ]
