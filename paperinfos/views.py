@@ -25,15 +25,19 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 def extract_text_from_pdf(pdf_path, start_page, end_page):
     document = fitz.open(pdf_path) #pdf 첫 페이지만 추출 + img 를 text 로 바꾸는 도구
     text = ""
-    for page_num in range(start_page - 1, end_page):
+    for page_num in range(start_page - 1, end_page+1):
         page = document.load_page(page_num)
         text += page.get_text()
+    print(text)
+
     return text
 
 # GPT API에 텍스트 전달하여 정보 추출 함수
 def extract_info_from_text(pdf_text):
     prompt = f"""This is the text of a paper that you will generate citations for: {pdf_text}
 You are provided with a paper's details, citation guidelines, and styles (APA, MLA, Chicago, Vancouver). Based on this information, generate citations for each style, keeping the author names and journal title exactly as they appear in the original language. Use the following output format in JSON:
+If the information on the first page is insufficient, pull information from other pages and complete it as similarly as possible to APA, MLA, Chicago, and Vancouver. 
+Even if the information is insufficient, try to complete the title and author name accurately. However, if the information does not exist at all, fill in the corresponding part with <unknown>. Be aware of hallucination, and don't just print the example given below.
 
 Paper Details:
 
@@ -113,7 +117,7 @@ class ProcessPaperInfo(APIView):
         print("*****entered 2")
 
         pdf_path = paper.pdf.path
-        pdf_text = extract_text_from_pdf(pdf_path, 1, 2)
+        pdf_text = extract_text_from_pdf(pdf_path, 1, 3)
 
         print("*****entered 3")
 
