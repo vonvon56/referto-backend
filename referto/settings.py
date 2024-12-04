@@ -48,7 +48,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['referto-backend', '127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev', 'https://referto-backend.fly.dev','localhost', '*']
 
-
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:3000',
     "http://localhost:3000",
@@ -187,7 +187,7 @@ SOCIALACCOUNT_PROVIDERS = {
             'secret': os.environ.get('SOCIAL_AUTH_NAVER_SECRET'),
             'key': ''
         }
-    }
+    } 
 }
 
     
