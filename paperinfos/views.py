@@ -35,9 +35,19 @@ def extract_text_from_pdf(pdf_path, start_page, end_page):
 # GPT API에 텍스트 전달하여 정보 추출 함수
 def extract_info_from_text(pdf_text):
     prompt = f"""This is the text of a paper that you will generate citations for: {pdf_text}
-You are provided with a paper's details, citation guidelines, and styles (APA, MLA, Chicago, Vancouver). Based on this information, generate citations for each style, keeping the author names and journal title exactly as they appear in the original language. Use the following output format in JSON:
-If the information on the first page is insufficient, pull information from other pages and complete it as similarly as possible to APA, MLA, Chicago, and Vancouver. 
-Even if the information is insufficient, try to complete the title and author name accurately. However, if the information does not exist at all, fill in the corresponding part with <unknown>. Be aware of hallucination, and don't just print the example given below.
+
+There may not be enough information, and the first page may only have dummy information. In such cases, you can definitely extract the author's name and title from another page.
+If the information on the first page is insufficient, you must be able to pull information from other pages.
+Even if the information is insufficient, you just fill every part by this form, Korean and English. try to complete the title and author name accurately. Be aware of hallucination, and don't just print the example given below.
+Be aware of hallucination, and don't just print the example given below. There must be title and author name, so you must find it.
+If there is no blank in the content, edit them appropriately.
+Follow the format below.
+
+If it is a Korean paper) 전지은, 「윌렘 드 쿠닝의 1980년대 회화의 연구」 (석사학위논문, 숙명여자대학교, 2016).
+If it is an English paper) Thomas Crow, "Jacques-Louis David's 'Oath of the Horatii': Painting and Pre-Revolutionary Radicalism" (Ph.D. dissertation, UCLA, 1978), 56.
+
+
+If You are provided with a paper's details, citation guidelines, and styles (APA, MLA, Chicago, Vancouver), follow the instruction below. Based on this information, generate citations for each style, keeping the author names and journal title exactly as they appear in the original language. Use the following output format in JSON:
 
 Paper Details:
 
@@ -65,6 +75,7 @@ example:
   "vancouver": "이경철, 김대영. 일본어에서 간접차용된 영어 차용어의 음운론적 특질. 환경연구. 2023;10(2):195-202."
 }}
 Ensure that the author names, journal title, and paper title remain exactly as they appear in the provided details, in the original language, and do not use "&" between the author names.
+
 """
     
     try:
