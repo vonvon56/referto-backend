@@ -115,6 +115,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
     'whitenoise.runserver_nostatic', 
+    'notes',
 ]
 
 # SECURE_SSL_REDIRECT = True  # HTTP 요청을 HTTPS로 리다이렉트
