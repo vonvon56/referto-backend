@@ -42,11 +42,16 @@ pymysql.install_as_MySQLdb()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY =env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 
-
-ALLOWED_HOSTS = ['referto-backend', '127.0.0.1:8000', '127.0.0.1', 'referto-backend.fly.dev', 'https://referto-backend.fly.dev','localhost', '*']
+ALLOWED_HOSTS = [
+    'ec2-43-201-56-176.ap-northeast-2.compute.amazonaws.com',
+    '43.201.56.176',
+    'referto-backend',
+    '127.0.0.1',
+    'localhost',
+]
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
@@ -67,11 +72,13 @@ CORS_ALLOW_HEADERS = (
 )
 # Application definition
 CSRF_TRUSTED_ORIGINS = [
-   'http://127.0.0.1:3000', 
-   'http://localhost:3000',
-   'https://referto-backend.fly.dev',
-   'http://43.201.56.176:8000',
+    'http://ec2-43-201-56-176.ap-northeast-2.compute.amazonaws.com',
+    'http://43.201.56.176',
+    'http://127.0.0.1:3000',
+    'http://localhost:3000',
+    'https://referto-backend.fly.dev',
 ]
+
 CORS_ORIGIN_ALLOW_ALL = False 
 # SECURE_SSL_REDIRECT = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -108,6 +115,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'corsheaders',
     'whitenoise.runserver_nostatic', 
+    'notes',
 ]
 
 # SECURE_SSL_REDIRECT = True  # HTTP 요청을 HTTPS로 리다이렉트
@@ -240,12 +248,8 @@ WSGI_APPLICATION = 'referto.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+
+
 
 # DATABASES = {
 #     'default': {
