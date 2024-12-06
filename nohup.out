@@ -1,0 +1,9 @@
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+July 26, 2024 - 17:46:03
+Django version 5.0.7, using settings 'referto.settings'
+Starting development server at http://127.0.0.1:8000/
+Quit the server with CONTROL-C.
+
