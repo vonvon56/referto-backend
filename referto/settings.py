@@ -22,11 +22,14 @@ environ.Env.read_env(
     env_file=os.path.join(BASE_DIR, '.env')
 )
 
-DEBUG = env('DEBUG')
+DEBUG = False
 
 # Add Backend URL configuration
 BACKEND_URL = 'https://api.referto.site' if not DEBUG else 'http://localhost:8000'
 FRONTEND_URL = 'https://www.referto.site' if not DEBUG else 'http://localhost:3000'
+
+# Google OAuth 설정
+GOOGLE_CALLBACK_URI = f'{BACKEND_URL}/api/user/google/callback/'
 
 # Kakao API configuration
 KAKAO_REST_API_KEY = os.environ.get("KAKAO_SECRET_KEY")
@@ -56,9 +59,12 @@ ALLOWED_HOSTS = [
     'referto-backend',
     '127.0.0.1',
     'localhost',
+    'api.referto.site',
+    'www.referto.site',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS 설정 정리
+CORS_ALLOW_ALL_ORIGINS = False  # True로 설정하면 모든 도메인 허용
 CORS_ALLOWED_ORIGINS = [
     'https://api.referto.site',
     'https://www.referto.site',
@@ -68,15 +74,16 @@ CORS_ALLOWED_ORIGINS = [
     'http://127.0.0.1:8000',
 ]
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = (
+CORS_ALLOW_HEADERS = [
     "accept",
     "authorization",
     "content-type",
     "user-agent",
     "x-csrftoken",
     "x-requested-with",
-)
-# Application definition
+]
+
+# CSRF 설정
 CSRF_TRUSTED_ORIGINS = [
     'https://api.referto.site',
     'https://www.referto.site',
@@ -84,15 +91,11 @@ CSRF_TRUSTED_ORIGINS = [
     'http://127.0.0.1:3000',
 ]
 
-CORS_ORIGIN_ALLOW_ALL = False 
-# SECURE_SSL_REDIRECT = True
+# 보안 설정
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-
-# Ensure that cookies are only sent via HTTPS
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
-CORS_ORIGIN_WHITELIST = ['http://43.201.56.176:8000', 'http://127.0.0.1:3000' ,'http://localhost:3000', 'https://referto-backend.fly.dev','http://referto-backend.fly.dev']
 INSTALLED_APPS = [
     'allauth',
     'allauth.account',
@@ -171,15 +174,12 @@ MIDDLEWARE = [
 ]
 
 AUTHENTICATION_BACKENDS = (
-    # 'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
-
 SOCIALACCOUNT_PROVIDERS = {
     'google': {
-        'PROVIDER': 'allauth.socialaccount.providers.google.GoogleProvider',
         'SCOPE': [
             'profile',
             'email',
@@ -191,39 +191,12 @@ SOCIALACCOUNT_PROVIDERS = {
             'client_id': os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID"),
             'secret': os.environ.get("SOCIAL_AUTH_GOOGLE_SECRET"),
             'key': ''
-        },
-        'METHOD': 'oauth2',
-    }, 
+        }
+    },
     'naver': {
         'APP': {
             'client_id': os.environ.get('SOCIAL_AUTH_NAVER_CLIENT_ID'),
             'secret': os.environ.get('SOCIAL_AUTH_NAVER_SECRET'),
-            'key': ''
-        }
-    } 
-}
-
-    
-
-
-AUTHENTICATION_BACKENDS = (
-    # 'social_core.backends.google.GoogleOAuth2',
-    'django.contrib.auth.backends.ModelBackend',
-    'allauth.account.auth_backends.AuthenticationBackend',
-)
-
-SOCIALACCOUNT_PROVIDERS = {
-    'google': {
-        'SCOPE': [
-            'profile',
-            'email',
-        ],
-        'AUTH_PARAMS': {
-            'access_type': 'online',
-        },
-        'APP': {
-            'client_id': os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID"),
-            'secret': os.environ.get("SOCIAL_AUTH_GOOGLE_SECRET"),
             'key': ''
         }
     }
@@ -382,3 +355,4 @@ LOGGING = {
         },
     },
 }
+

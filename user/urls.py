@@ -1,7 +1,7 @@
 from .views import *
 from .kakaologin_views import *
 from .naverlogin_views import *
-from .googlelogin_views import *
+from .googlelogin_views import google_login, google_callback, GoogleLogin
 from django.urls import path, include
 #from rest_framework_simplejwt.views import TokenRefreshView
 

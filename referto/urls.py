@@ -35,6 +35,9 @@ schema_view = get_schema_view(
     # url='https://referto-backend.fly.dev',  # URL을 HTTPS로 설정합니다.
 )
 
+def health_check(request):
+    return JsonResponse({"status": "ok"})
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
@@ -52,4 +55,6 @@ urlpatterns = [
     path('auth', kakao_callback, name='kakao_callback'),
     # notes
     path('api/notes/', include('notes.urls')),
+    # health check
+    path('api/health/', health_check, name='health_check'),
 ]

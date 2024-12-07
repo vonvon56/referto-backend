@@ -13,19 +13,57 @@ from .models import *
 from allauth.socialaccount.models import SocialAccount
 from .views import *
 from django.conf import settings
+import logging
+
+logger = logging.getLogger(__name__)
 
 # 구글 소셜로그인 변수 설정
 state = os.environ.get("STATE")
 
 # 환경 변수나 설정에 따라 BASE_URL 결정
 BASE_URL = settings.BACKEND_URL
-GOOGLE_CALLBACK_URI = f"{BASE_URL}/api/user/google/callback/"
+GOOGLE_CALLBACK_URI = settings.GOOGLE_CALLBACK_URI
 
 # 구글 로그인
 def google_login(request):
-    scope = "https://www.googleapis.com/auth/userinfo.email"
-    client_id = os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
-    return redirect(f"https://accounts.google.com/o/oauth2/v2/auth?client_id={client_id}&response_type=code&redirect_uri={GOOGLE_CALLBACK_URI}&scope={scope}")
+    try:
+        scope = "https://www.googleapis.com/auth/userinfo.email"
+        client_id = os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
+        callback_uri = settings.GOOGLE_CALLBACK_URI
+        
+        # 환경 변수 확인
+        logger.info(f"Client ID: {client_id}")
+        logger.info(f"Callback URI: {callback_uri}")
+        
+        if not client_id:
+            return JsonResponse({
+                "error": "Missing Google client ID",
+                "detail": "SOCIAL_AUTH_GOOGLE_CLIENT_ID environment variable is not set"
+            }, status=400)
+            
+        if not callback_uri:
+            return JsonResponse({
+                "error": "Missing callback URI",
+                "detail": "GOOGLE_CALLBACK_URI is not configured in settings"
+            }, status=400)
+        
+        auth_url = (
+            "https://accounts.google.com/o/oauth2/v2/auth?"
+            f"client_id={client_id}&"
+            "response_type=code&"
+            f"redirect_uri={callback_uri}&"
+            f"scope={scope}"
+        )
+        
+        logger.info(f"Generated auth URL: {auth_url}")
+        return redirect(auth_url)
+        
+    except Exception as e:
+        logger.error(f"Error in google_login: {str(e)}")
+        return JsonResponse({
+            "error": "Failed to initialize Google login",
+            "detail": str(e)
+        }, status=500)
 
 
 import json
@@ -184,3 +222,4 @@ class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
     callback_url = 'https://api.referto.site/api/user/google/callback/'
     client_class = OAuth2Client
+
