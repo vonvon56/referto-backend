@@ -24,12 +24,13 @@ environ.Env.read_env(
 
 DEBUG = False
 
-# Add Backend URL configuration
-BACKEND_URL = 'https://api.referto.site' if not DEBUG else 'http://localhost:8000'
-FRONTEND_URL = 'https://www.referto.site' if not DEBUG else 'http://localhost:3000'
+# Backend URL 및 콜백 URI 설정
+BACKEND_URL = 'http://localhost:8000/' if DEBUG else 'https://api.referto.site/'
+FRONTEND_URL = 'http://localhost:3000' if DEBUG else 'https://www.referto.site'
+GOOGLE_CALLBACK_URI = f'{BACKEND_URL}api/user/google/callback/'
 
 # Google OAuth 설정
-GOOGLE_CALLBACK_URI = f'{BACKEND_URL}/api/user/google/callback/'
+GOOGLE_CALLBACK_URI = f'{BACKEND_URL}api/user/google/callback/'
 
 # Kakao API configuration
 KAKAO_REST_API_KEY = os.environ.get("KAKAO_SECRET_KEY")
@@ -54,7 +55,7 @@ DEBUG = False
 
 
 ALLOWED_HOSTS = [
-    'ec2-13-125-243-148.ap-northeast-2.compute.amazonaws.com'
+    'ec2-13-125-243-148.ap-northeast-2.compute.amazonaws.com',
     '13.125.243.148',
     'referto-backend',
     '127.0.0.1',
@@ -64,23 +65,36 @@ ALLOWED_HOSTS = [
 ]
 
 # CORS 설정 정리
-CORS_ALLOW_ALL_ORIGINS = False  # True로 설정하면 모든 도메인 허용
+CORS_ALLOW_ALL_ORIGINS = False 
 CORS_ALLOWED_ORIGINS = [
     'https://api.referto.site',
     'https://www.referto.site',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'http://localhost:8000',
-    'http://127.0.0.1:8000',
 ]
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
-    "accept",
-    "authorization",
-    "content-type",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'access-control-allow-credentials',
+    'Access-Control-Allow-Credentials',
+    'Access-Control-Allow-Origin',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
 ]
 
 # CSRF 설정
@@ -95,6 +109,8 @@ CSRF_TRUSTED_ORIGINS = [
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'Lax'
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 INSTALLED_APPS = [
     'allauth',

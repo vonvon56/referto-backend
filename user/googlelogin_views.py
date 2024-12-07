@@ -31,17 +31,20 @@ def google_login(request):
         client_id = os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
         callback_uri = settings.GOOGLE_CALLBACK_URI
         
-        # 환경 변수 확인
+        # 디버그 로깅 추가
+        logger.info(f"Debug mode: {settings.DEBUG}")
         logger.info(f"Client ID: {client_id}")
         logger.info(f"Callback URI: {callback_uri}")
         
         if not client_id:
+            logger.error("Missing Google client ID")
             return JsonResponse({
                 "error": "Missing Google client ID",
                 "detail": "SOCIAL_AUTH_GOOGLE_CLIENT_ID environment variable is not set"
             }, status=400)
             
         if not callback_uri:
+            logger.error("Missing callback URI")
             return JsonResponse({
                 "error": "Missing callback URI",
                 "detail": "GOOGLE_CALLBACK_URI is not configured in settings"
@@ -55,7 +58,7 @@ def google_login(request):
             f"scope={scope}"
         )
         
-        logger.info(f"Generated auth URL: {auth_url}")
+        logger.info(f"Redirecting to Google auth URL: {auth_url}")
         return redirect(auth_url)
         
     except Exception as e:
@@ -220,6 +223,6 @@ from django.http import JsonResponse
     
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = 'https://api.referto.site/api/user/google/callback/'
+    callback_url = settings.GOOGLE_CALLBACK_URI
     client_class = OAuth2Client
 
