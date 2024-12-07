@@ -54,8 +54,8 @@ DEBUG = False
 
 
 ALLOWED_HOSTS = [
-    'ec2-43-201-56-176.ap-northeast-2.compute.amazonaws.com',
-    '43.201.56.176',
+    'ec2-13-125-243-148.ap-northeast-2.compute.amazonaws.com'
+    '13.125.243.148',
     'referto-backend',
     '127.0.0.1',
     'localhost',
