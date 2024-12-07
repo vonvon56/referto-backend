@@ -12,13 +12,14 @@ from rest_framework import status
 from .models import *
 from allauth.socialaccount.models import SocialAccount
 from .views import *
+from django.conf import settings
+
 # 구글 소셜로그인 변수 설정
 state = os.environ.get("STATE")
 
 # 환경 변수나 설정에 따라 BASE_URL 결정
-IS_PRODUCTION = os.environ.get('DJANGO_ENV') == 'production'
-BASE_URL = 'http://ec2-43-201-56-176.ap-northeast-2.compute.amazonaws.com/' if IS_PRODUCTION else 'http://127.0.0.1:8000/'
-GOOGLE_CALLBACK_URI = f"{BASE_URL}api/user/google/callback/"
+BASE_URL = settings.BACKEND_URL
+GOOGLE_CALLBACK_URI = f"{BASE_URL}/api/user/google/callback/"
 
 # 구글 로그인
 def google_login(request):
@@ -42,14 +43,20 @@ def google_callback(request):
     client_id = os.environ.get("SOCIAL_AUTH_GOOGLE_CLIENT_ID")
     client_secret = os.environ.get("SOCIAL_AUTH_GOOGLE_SECRET")
     code = request.GET.get('code')
-    state = request.GET.get('state')
     
     if not code:
         return JsonResponse({"error": "No code provided"}, status=400)
 
-    # 1. Token Request
+    # 1. Token Request - state 파라미터 제거
     token_req = requests.post(
-        f"https://oauth2.googleapis.com/token?client_id={client_id}&client_secret={client_secret}&code={code}&grant_type=authorization_code&redirect_uri={GOOGLE_CALLBACK_URI}&state={state}"
+        f"https://oauth2.googleapis.com/token",
+        data={
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'code': code,
+            'grant_type': 'authorization_code',
+            'redirect_uri': GOOGLE_CALLBACK_URI
+        }
     )
     
     try:
@@ -88,8 +95,7 @@ def google_callback(request):
         # 유저가 활성화된 경우
         if user.is_active:
             # 프론트엔드 URL 설정
-            frontend_url = 'http://localhost:3000' if not IS_PRODUCTION else 'https://www.referto.site'
-            redirect_url = f"{frontend_url}/google/callback?access_token={access_token}&refresh_token={refresh_token}"
+            redirect_url = f"{settings.FRONTEND_URL}/google/callback?access_token={access_token}&refresh_token={refresh_token}"
             return HttpResponseRedirect(redirect_url)
         else:
             # 활성화되지 않은 회원, Exception 발생
@@ -176,5 +182,5 @@ from django.http import JsonResponse
     
 class GoogleLogin(SocialLoginView):
     adapter_class = GoogleOAuth2Adapter
-    callback_url = 'http://ec2-43-201-56-176.ap-northeast-2.compute.amazonaws.com/api/user/google/callback/'
+    callback_url = 'https://api.referto.site/api/user/google/callback/'
     client_class = OAuth2Client
