@@ -51,12 +51,13 @@ pymysql.install_as_MySQLdb()
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY =env('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 
 ALLOWED_HOSTS = [
     'ec2-13-125-243-148.ap-northeast-2.compute.amazonaws.com',
     '13.125.243.148',
+    '43.202.1.60',
     'referto-backend',
     '127.0.0.1',
     'localhost',
@@ -247,10 +248,10 @@ WSGI_APPLICATION = 'referto.wsgi.application'
 
 # 환경 변수에서 DATABASE_ENGINE 값을 읽어옵니다.
 # 'sqlite3'가 기본값이고, 필요시 'mysql'로 설정합니다.
-DATABASE_ENGINE = os.getenv("DATABASE_ENGINE", "sqlite3")
+# DATABASE_ENGINE = os.getenv("DATABASE_ENGINE", "sqlite3")
 
-if DATABASE_ENGINE == "mysql":
-    DATABASES = {
+#if DATABASE_ENGINE == "mysql":
+DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.mysql',  # MySQL 엔진
             'NAME': os.getenv("DB_NAME", "referto_db"),  # DB 이름
@@ -263,13 +264,13 @@ if DATABASE_ENGINE == "mysql":
             }
         }
     }
-else:  # 기본 sqlite3 설정
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+#else:  # 기본 sqlite3 설정
+#    DATABASES = {
+#        'default': {
+#            'ENGINE': 'django.db.backends.sqlite3',
+#            'NAME': BASE_DIR / 'db.sqlite3',
+#        }
+#    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -337,8 +338,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # <-- Updated!
+STATIC_URL = '/static/'
+STATIC_ROOT = '/home/ubuntu/referto-backend/staticfiles'  # <-- Updated!
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'  # <-- Updated!
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

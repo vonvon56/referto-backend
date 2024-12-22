@@ -14,6 +14,7 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.http import HttpResponse
 from django.contrib import admin
 from django.urls import path, re_path, include
 from rest_framework import permissions
@@ -35,12 +36,14 @@ schema_view = get_schema_view(
     # url='https://referto-backend.fly.dev',  # URL을 HTTPS로 설정합니다.
 )
 
-def health_check(request):
-    return JsonResponse({"status": "ok"})
+# 간단한 테스트 뷰 추가
+def home(request):
+    return HttpResponse("Hello, Django Server is running!")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('', home),  # 루트 경로
     # user
     #path('api/user/', include('allauth.urls')),
     path('api/user/', include('user.urls')),
@@ -55,6 +58,4 @@ urlpatterns = [
     path('auth', kakao_callback, name='kakao_callback'),
     # notes
     path('api/notes/', include('notes.urls')),
-    # health check
-    path('api/health/', health_check, name='health_check'),
 ]
