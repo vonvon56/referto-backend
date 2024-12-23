@@ -55,6 +55,7 @@ DEBUG = True
 
 
 ALLOWED_HOSTS = [
+    'https://referto-frontend-five.vercel.app',
     'ec2-13-125-243-148.ap-northeast-2.compute.amazonaws.com',
     '13.125.243.148',
     '43.202.1.60',
@@ -68,6 +69,7 @@ ALLOWED_HOSTS = [
 # CORS 설정 정리
 CORS_ALLOW_ALL_ORIGINS = False 
 CORS_ALLOWED_ORIGINS = [
+    'https://referto-frontend-five.vercel.app',
     'https://api.referto.site',
     'https://www.referto.site',
     'http://localhost:3000',
@@ -251,26 +253,26 @@ WSGI_APPLICATION = 'referto.wsgi.application'
 # DATABASE_ENGINE = os.getenv("DATABASE_ENGINE", "sqlite3")
 
 #if DATABASE_ENGINE == "mysql":
-DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.mysql',  # MySQL 엔진
-            'NAME': os.getenv("DB_NAME", "referto_db"),  # DB 이름
-            'USER': os.getenv("DB_USER", "admin"),  # DB 사용자
-            'PASSWORD': os.getenv("DB_PASSWORD", "refertodb"),  # 비밀번호
-            'HOST': os.getenv("DB_HOST", "referto-db.cfsecok4g34k.ap-northeast-2.rds.amazonaws.com"),  # DB 호스트
-            'PORT': os.getenv("DB_PORT", "3306"),  # DB 포트
-            'OPTIONS': {
-                'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
-            }
-        }
-    }
+# DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.mysql',  # MySQL 엔진
+#             'NAME': os.getenv("DB_NAME", "referto_db"),  # DB 이름
+#             'USER': os.getenv("DB_USER", "admin"),  # DB 사용자
+#             'PASSWORD': os.getenv("DB_PASSWORD", "refertodb"),  # 비밀번호
+#             'HOST': os.getenv("DB_HOST", "referto-db.cfsecok4g34k.ap-northeast-2.rds.amazonaws.com"),  # DB 호스트
+#             'PORT': os.getenv("DB_PORT", "3306"),  # DB 포트
+#             'OPTIONS': {
+#                 'init_command': "SET sql_mode='STRICT_TRANS_TABLES'"
+#             }
+#         }
+#     }
 #else:  # 기본 sqlite3 설정
-#    DATABASES = {
-#        'default': {
-#            'ENGINE': 'django.db.backends.sqlite3',
-#            'NAME': BASE_DIR / 'db.sqlite3',
-#        }
-#    }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
