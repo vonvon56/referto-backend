@@ -60,8 +60,17 @@ class AuthAPIView(APIView):
     )
     def get(self, request):
         try:
-            # access token을 decode 해서 유저 id 추출 => 유저 식별
-            access = request.COOKIES['access_token']
+            # Try to get token from Authorization header first
+            auth_header = request.headers.get('Authorization')
+            if auth_header and auth_header.startswith('Bearer '):
+                access = auth_header.split(' ')[1]
+            else:
+                # Fallback to cookies
+                access = request.COOKIES.get('access_token')
+
+            if not access:
+                return Response({'error': 'No access token provided'}, status=status.HTTP_401_UNAUTHORIZED)
+
             payload = jwt.decode(access, SECRET_KEY, algorithms=['HS256'])
             pk = payload.get('user_id')
             user = get_object_or_404(User, pk=pk)
@@ -87,7 +96,9 @@ class AuthAPIView(APIView):
 
         except(jwt.exceptions.InvalidTokenError):
             # 사용 불가능한 토큰일 때
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     # 로그인
     @swagger_auto_schema(
