@@ -61,43 +61,42 @@ class AuthAPIView(APIView):
     def get(self, request):
         try:
             # Try to get token from Authorization header first
-            auth_header = request.headers.get('Authorization')
+            auth_header = request.headers.get('Authorization', '')
+            print(f"[Auth] Headers: {dict(request.headers)}")
+            print(f"[Auth] Authorization header: {auth_header}")
+            
+            access = None
             if auth_header and auth_header.startswith('Bearer '):
                 access = auth_header.split(' ')[1]
+                print(f"[Auth] Token from Authorization header: {access}")
             else:
                 # Fallback to cookies
                 access = request.COOKIES.get('access_token')
+                print(f"[Auth] Token from cookies: {access}")
+                print(f"[Auth] All cookies: {request.COOKIES}")
 
             if not access:
                 return Response({'error': 'No access token provided'}, status=status.HTTP_401_UNAUTHORIZED)
 
-            payload = jwt.decode(access, SECRET_KEY, algorithms=['HS256'])
-            pk = payload.get('user_id')
-            user = get_object_or_404(User, pk=pk)
-            serializer = UserSerializer(instance=user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        except(jwt.exceptions.ExpiredSignatureError):
-            # 토큰 만료 시 토큰 갱신
-            data = {'refresh_token': request.COOKIES.get('refresh_token', None)}
-            serializer = TokenRefreshSerializer(data=data)
-            if serializer.is_valid(raise_exception=True):
-                access = serializer.data.get('access_token', None)
-                refresh = serializer.data.get('refresh_token', None)
+            print(f"[Auth] Final token being used: {access}")
+            
+            try:
                 payload = jwt.decode(access, SECRET_KEY, algorithms=['HS256'])
                 pk = payload.get('user_id')
+                if not pk:
+                    return Response({'error': 'Invalid token: no user_id'}, status=status.HTTP_401_UNAUTHORIZED)
+                    
                 user = get_object_or_404(User, pk=pk)
                 serializer = UserSerializer(instance=user)
-                res = Response(serializer.data, status=status.HTTP_200_OK)
-                res.set_cookie('access_token', access)
-                res.set_cookie('refresh_token', refresh)
-                return res
-            raise jwt.exceptions.InvalidTokenError
+                return Response(serializer.data, status=status.HTTP_200_OK)
+                
+            except jwt.InvalidTokenError:
+                return Response({'error': 'Invalid token format'}, status=status.HTTP_401_UNAUTHORIZED)
+            except jwt.ExpiredSignatureError:
+                return Response({'error': 'Token has expired'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        except(jwt.exceptions.InvalidTokenError):
-            # 사용 불가능한 토큰일 때
-            return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
         except Exception as e:
+            print(f"[Auth] Error in get: {str(e)}")
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     # 로그인
