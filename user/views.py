@@ -69,8 +69,9 @@ class AuthAPIView(APIView):
             if auth_header and auth_header.startswith('Bearer '):
                 access = auth_header.split(' ')[1]
                 print(f"[Auth] Token from Authorization header: {access}")
-            else:
-                # Fallback to cookies
+            
+            # If no token in header, try cookies
+            if not access:
                 access = request.COOKIES.get('access_token')
                 print(f"[Auth] Token from cookies: {access}")
                 print(f"[Auth] All cookies: {request.COOKIES}")
