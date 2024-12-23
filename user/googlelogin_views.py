@@ -153,15 +153,9 @@ def google_callback(request):
             refresh_token = str(token)
             access_token = str(token.access_token)
             
-            # 응답 반환
-            return JsonResponse({
-                'user': serializer.data,
-                'message': 'User registered successfully',
-                'token': {
-                    'access_token': access_token,
-                    'refresh_token': refresh_token,
-                }
-            }, status=status.HTTP_201_CREATED)
+            # 리다이렉트로 통일
+            redirect_url = f"{settings.FRONTEND_URL}/google/callback?access_token={access_token}&refresh_token={refresh_token}"
+            return HttpResponseRedirect(redirect_url)
         else:
             return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -193,15 +187,9 @@ def google_callback(request):
                 refresh_token = str(token)
                 access_token = str(token.access_token)
                 
-                # 응답 반환
-                return JsonResponse({
-                    'user': serializer.data,
-                    'message': 'User registered successfully',
-                    'token': {
-                        'access_token': access_token,
-                        'refresh_token': refresh_token,
-                    }
-                }, status=status.HTTP_201_CREATED)
+                # 리다이렉트로 통일
+                redirect_url = f"{settings.FRONTEND_URL}/google/callback?access_token={access_token}&refresh_token={refresh_token}"
+                return HttpResponseRedirect(redirect_url)
             else:
                 return JsonResponse(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
                 
